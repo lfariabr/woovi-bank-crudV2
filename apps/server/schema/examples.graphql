@@ -1,0 +1,54 @@
+# Example of query to get messages
+query {
+  messages (first: 1) {
+    pageInfo {
+      startCursor
+      endCursor
+    }
+    edges {
+      node {
+        id
+        content
+        createdAt
+      }
+    }
+  }
+}
+
+# Example of query to get accounts
+query {
+  accounts (first: 1) {
+    pageInfo {
+      startCursor
+      endCursor
+    }
+    edges {
+      node {
+        id
+        first_name
+        last_name
+        email
+        taxId
+        accountId
+        createdAt
+      }
+    }
+  }
+}
+
+# Example of query to add an account
+mutation {
+  AccountAdd(
+    input: {first_name: "John", last_name: "Doe", email: "john.doe@example.com", taxId: "123456789", accountId: "123456789"}
+  ) {
+    account {
+      id
+      first_name
+      last_name
+      email
+      taxId
+      accountId
+      createdAt
+    }
+  }
+}
