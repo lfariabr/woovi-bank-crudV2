@@ -55,7 +55,7 @@ mutation {
 
 # Example of subscription to account added
 subscription {
-  AccountAdded {
+  AccountAdded(input: {})	 {
     account {
       id
       first_name
