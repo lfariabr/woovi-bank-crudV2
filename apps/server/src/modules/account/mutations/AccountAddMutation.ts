@@ -42,7 +42,7 @@ const mutation = mutationWithClientMutationId({
             taxId: args.taxId,
             accountId: args.accountId,
         }).save();
-
+        console.log('Publishing ACCOUNT.ADDED', { account: account._id.toString() });
         redisPubSub.publish(PUB_SUB_EVENTS.ACCOUNT.ADDED, {
             account: account._id.toString(),
         });

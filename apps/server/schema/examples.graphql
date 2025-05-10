@@ -67,3 +67,25 @@ subscription {
     }
   }
 }
+
+# Example of subscription to messages
+subscription {
+  MessageAdded(input: {}) {
+    message {
+      id
+      content
+      createdAt
+    }
+  }
+}
+
+# Example of sending message via mutation
+mutation {
+  MessageAdd(input: { content: "Hello message from Mutations!" }) {
+    message {
+      id
+      content
+      createdAt
+    }
+  }
+}

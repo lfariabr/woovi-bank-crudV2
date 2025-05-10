@@ -16,7 +16,7 @@ const subscription = subscriptionWithClientId({
 	name: 'AccountAdded',
 	subscribe: withFilter(
 		() => redisPubSub.asyncIterator(PUB_SUB_EVENTS.ACCOUNT.ADDED),
-		async (payload: AccountAddedPayload, context) => {
+		async (payload: AccountAddedPayload) => {
 			const account = await Account.findOne({
 				_id: new mongoose.Types.ObjectId(payload.account),
 			});
@@ -29,7 +29,7 @@ const subscription = subscriptionWithClientId({
 		}
 	),
 	getPayload: async (obj: AccountAddedPayload) => {
-		console.log('AccountAddedSubscription getPayload', obj);
+		// console.log('AccountAddedSubscription getPayload', obj);
 		if (!obj || !obj.account) return {};
 		return { account: obj.account };
 	},
@@ -37,7 +37,7 @@ const subscription = subscriptionWithClientId({
 		account: {
 			type: AccountType,
 			resolve: async (obj: any, _, context) => {
-				console.log('account resolve', obj);
+				// console.log('account resolve', obj);
 				if (!obj || !obj.account) return null;
 				return await Account.findOne({
 				  _id: new mongoose.Types.ObjectId(obj.account),

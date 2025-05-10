@@ -1,4 +1,10 @@
 type Query {
+  accounts(
+    after: String
+    first: Int
+    before: String
+    last: Int
+  ): AccountConnection
   messages(
     """Returns the items in the list that come after the specified cursor."""
     after: String
@@ -12,6 +18,49 @@ type Query {
     """Returns the last n items from the list."""
     last: Int
   ): MessageConnection
+}
+
+type Account implements Node {
+  id: ID!
+  first_name: String
+  last_name: String
+  email: String
+  taxId: String
+  accountId: String
+  createdAt: String
+}
+
+type AccountConnection {
+  pageInfo: PageInfo!
+  edges: [AccountEdge]
+}
+
+type AccountEdge {
+  node: Account
+  cursor: String!
+}
+
+type AccountAddPayload {
+  account: Account
+  clientMutationId: String
+}
+
+input AccountAddInput {
+  first_name: String!
+  last_name: String!
+  email: String!
+  taxId: String!
+  accountId: String!
+  clientMutationId: String
+}
+
+type AccountAddedPayload {
+  account: Account
+  clientSubscriptionId: String
+}
+
+input AccountAddedInput {
+  clientSubscriptionId: String
 }
 
 """A connection to a list of items."""
@@ -62,6 +111,7 @@ interface Node {
 }
 
 type Mutation {
+  AccountAdd(input: AccountAddInput!): AccountAddPayload
   MessageAdd(input: MessageAddInput!): MessageAddPayload
 }
 
@@ -76,6 +126,7 @@ input MessageAddInput {
 }
 
 type Subscription {
+  AccountAdded(input: AccountAddedInput!): AccountAddedPayload
   MessageAdded(input: MessageAddedInput!): MessageAddedPayload
 }
 
