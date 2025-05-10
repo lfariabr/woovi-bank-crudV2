@@ -52,3 +52,18 @@ mutation {
     }
   }
 }
+
+# Example of subscription to account added
+subscription {
+  AccountAdded {
+    account {
+      id
+      first_name
+      last_name
+      email
+      taxId
+      accountId
+      createdAt
+    }
+  }
+}
