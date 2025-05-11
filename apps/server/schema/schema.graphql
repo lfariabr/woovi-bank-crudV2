@@ -112,7 +112,13 @@ interface Node {
 
 type Mutation {
   AccountAdd(input: AccountAddInput!): AccountAddPayload
+  AccountUpdate(input: AccountUpdateInput!): AccountUpdatePayload
   MessageAdd(input: MessageAddInput!): MessageAddPayload
+}
+
+type AccountUpdatePayload {
+  account: Account
+  clientMutationId: String
 }
 
 type MessageAddPayload {
@@ -127,7 +133,18 @@ input MessageAddInput {
 
 type Subscription {
   AccountAdded(input: AccountAddedInput!): AccountAddedPayload
+  AccountUpdated(input: AccountUpdatedInput!): AccountUpdatedPayload
   MessageAdded(input: MessageAddedInput!): MessageAddedPayload
+}
+
+type AccountAddedPayload {
+  account: Account
+  clientSubscriptionId: String
+}
+
+type AccountUpdatedPayload {
+  account: Account
+  clientSubscriptionId: String
 }
 
 type MessageAddedPayload {

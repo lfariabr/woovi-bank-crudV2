@@ -7,6 +7,8 @@ import { createGraphqlWs } from './server/createGraphqlWs';
 import { getContext } from './server/getContext';
 import { schema } from './schema/schema';
 import { wsServer } from './server/wsServer';
+import dotenv from 'dotenv';
+dotenv.config();
 
 (async () => {
 	await connectDatabase();
@@ -27,6 +29,7 @@ import { wsServer } from './server/wsServer';
 
 	server.listen(config.PORT, () => {
 		// eslint-disable-next-line
-		console.log(`Server running on port:${config.PORT}`);
+		console.log(`Server running on port: ${config.PORT}`);
+		console.log('Redis running on:', process.env.REDIS_HOST);
 	});
 })();

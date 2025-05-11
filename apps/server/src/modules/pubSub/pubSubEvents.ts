@@ -4,5 +4,6 @@ export const PUB_SUB_EVENTS = {
 	},
 	ACCOUNT: {
 		ADDED: 'ACCOUNT:ADDED',
+		UPDATED: 'ACCOUNT:UPDATED',
 	},
 } as const;

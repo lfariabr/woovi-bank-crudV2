@@ -14,14 +14,17 @@ const Schema = new mongoose.Schema<IAccount>(
 		email: {
 			type: String,
 			description: 'The email of the account',
+			unique: true,
 		},
 		taxId: {
 			type: String,
 			description: 'The tax id of the account',
+			unique: true,
 		},
 		accountId: {
 			type: String,
 			description: 'The account id of the account',
+			unique: true,
 		},
 	},
 	{

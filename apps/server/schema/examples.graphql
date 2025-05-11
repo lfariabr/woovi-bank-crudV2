@@ -1,3 +1,7 @@
+##############
+# QUERIES
+##############
+
 # Example of query to get messages
 query {
   messages (first: 1) {
@@ -17,7 +21,7 @@ query {
 
 # Example of query to get accounts
 query {
-  accounts (first: 1) {
+  accounts (first: 2) {
     pageInfo {
       startCursor
       endCursor
@@ -36,6 +40,10 @@ query {
   }
 }
 
+##############
+# MUTATIONS
+##############
+
 # Example of query to add an account
 mutation {
   AccountAdd(
@@ -52,6 +60,42 @@ mutation {
     }
   }
 }
+
+# Example of sending message via mutation
+mutation {
+  MessageAdd(input: { content: "Hello message from Mutations!" }) {
+    message {
+      id
+      content
+      createdAt
+    }
+  }
+}
+
+# Example of Updating an account
+mutation {
+  AccountUpdate(
+    input: {
+      accountId: "QWNjb3VudDo2ODFmMzEzNmVhODBlNmExOWY4NDdkNjQ="
+      first_name: "Luis"
+      last_name: "Faria"
+      email: "luis@email.com"
+      taxId: "418115"
+    }
+  ) {
+    account {
+      id
+      first_name
+      last_name
+      email
+      taxId
+    }
+  }
+}
+
+##############
+# SUBSCRIPTIONS
+##############
 
 # Example of subscription to account added
 subscription {
@@ -79,12 +123,16 @@ subscription {
   }
 }
 
-# Example of sending message via mutation
-mutation {
-  MessageAdd(input: { content: "Hello message from Mutations!" }) {
-    message {
+# Example of subscription to account updated
+subscription {
+  AccountUpdated(input: {})	 {
+    account {
       id
-      content
+      first_name
+      last_name
+      email
+      taxId
+      accountId
       createdAt
     }
   }

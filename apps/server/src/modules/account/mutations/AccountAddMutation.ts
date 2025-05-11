@@ -35,13 +35,15 @@ const mutation = mutationWithClientMutationId({
         },
     },
     mutateAndGetPayload: async (args: AccountAddInput) => {
-        const account = await new Account({
-            first_name: args.first_name,
-            last_name: args.last_name,
-            email: args.email,
-            taxId: args.taxId,
+        try {
+            const account = await new Account({
+                first_name: args.first_name,
+                last_name: args.last_name,
+                email: args.email,
+                taxId: args.taxId,
             accountId: args.accountId,
         }).save();
+
         console.log('Publishing ACCOUNT.ADDED', { account: account._id.toString() });
         redisPubSub.publish(PUB_SUB_EVENTS.ACCOUNT.ADDED, {
             account: account._id.toString(),
@@ -50,6 +52,15 @@ const mutation = mutationWithClientMutationId({
         return {
             account: account._id.toString(),
         };
+    } catch (error) {
+        if (error) {
+            if (error.code === 11000) {
+                const field = Object.keys(error.keyPattern)[0];
+                throw new Error(`${field} already exists. Please check the data.`);
+            }
+        }
+        throw error;
+    }
     },
     outputFields: {
         ...accountField('account'),
