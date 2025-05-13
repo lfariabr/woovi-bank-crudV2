@@ -14,6 +14,7 @@ export type AccountUpdateInput = {
     email: string;
     taxId: string;
     accountId: string;
+    balance: string;
 };
 
 const mutation = mutationWithClientMutationId({
@@ -34,6 +35,9 @@ const mutation = mutationWithClientMutationId({
         accountId: {
             type: GraphQLString,
         },
+        balance: {
+            type: GraphQLString,
+        },
     },
     mutateAndGetPayload: async (args: AccountUpdateInput) => {
         try {
@@ -46,6 +50,7 @@ const mutation = mutationWithClientMutationId({
             last_name: args.last_name,
             email: args.email,
             taxId: args.taxId,
+            balance: new mongoose.Types.Decimal128(args.balance),
         }, {
             new: true, // Returns the updated document
         });

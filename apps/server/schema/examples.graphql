@@ -35,6 +35,7 @@ query {
         taxId
         accountId
         createdAt
+        balance
       }
     }
   }
@@ -64,7 +65,7 @@ query {
 # Example of query to add an account
 mutation {
   AccountAdd(
-    input: {first_name: "John", last_name: "Doe", email: "john.doe@example.com", taxId: "123456789", accountId: "123456789"}
+    input: {first_name: "John", last_name: "Doe", email: "john.doe@example.com", taxId: "123456789", accountId: "123456789", balance: "100"}
   ) {
     account {
       id
@@ -74,6 +75,7 @@ mutation {
       taxId
       accountId
       createdAt
+      balance
     }
   }
 }
@@ -98,6 +100,7 @@ mutation {
       last_name: "Faria"
       email: "luis@email.com"
       taxId: "418115"
+      balance: "100"
     }
   ) {
     account {
@@ -106,6 +109,8 @@ mutation {
       last_name
       email
       taxId
+      accountId
+      balance
     }
   }
 }
@@ -141,6 +146,7 @@ subscription {
       email
       taxId
       accountId
+      balance
       createdAt
     }
   }
@@ -167,6 +173,7 @@ subscription {
       email
       taxId
       accountId
+      balance
       createdAt
     }
   }

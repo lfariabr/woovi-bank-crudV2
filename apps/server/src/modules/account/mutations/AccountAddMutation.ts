@@ -4,6 +4,7 @@ import { mutationWithClientMutationId, toGlobalId } from 'graphql-relay';
 import { redisPubSub } from '../../pubSub/redisPubSub';
 import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
 
+import mongoose from 'mongoose';
 import { Account } from '../accountModel';
 import { accountField } from '../accountFields';
 
@@ -13,6 +14,7 @@ export type AccountAddInput = {
     email: string;
     taxId: string;
     accountId: string;
+    balance: string;
 };
 
 const mutation = mutationWithClientMutationId({
@@ -33,6 +35,9 @@ const mutation = mutationWithClientMutationId({
         accountId: {
             type: new GraphQLNonNull(GraphQLString),
         },
+        balance: {
+            type: new GraphQLNonNull(GraphQLString),
+        },
     },
     mutateAndGetPayload: async (args: AccountAddInput) => {
         try {
@@ -42,6 +47,7 @@ const mutation = mutationWithClientMutationId({
                 email: args.email,
                 taxId: args.taxId,
             accountId: args.accountId,
+            balance: new mongoose.Types.Decimal128(args.balance),
         }).save();
 
         console.log('Publishing ACCOUNT.ADDED', { account: account._id.toString() });

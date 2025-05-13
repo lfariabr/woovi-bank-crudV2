@@ -26,6 +26,10 @@ const Schema = new mongoose.Schema<IAccount>(
 			description: 'The account id of the account',
 			unique: true,
 		},
+		balance: {
+			type: mongoose.Schema.Types.Decimal128,
+			description: 'The balance of the account',
+		},
 	},
 	{
 		collection: 'Account',
@@ -39,6 +43,7 @@ export type IAccount = {
 	email: string;
 	taxId: string;
 	accountId: string;
+	balance: mongoose.Schema.Types.Decimal128;
 	createdAt: Date;
 	updatedAt: Date;
 } & Document;
