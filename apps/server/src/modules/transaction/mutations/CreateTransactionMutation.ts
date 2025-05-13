@@ -1,16 +1,19 @@
-import { GraphQLString, GraphQLNonNull } from 'graphql';
+import { GraphQLString, GraphQLNonNull, GraphQLInt } from 'graphql';
 import { mutationWithClientMutationId, toGlobalId } from 'graphql-relay';
 
 import { redisPubSub } from '../../pubSub/redisPubSub';
 import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
 
 import { Transaction } from '../transactionModel';
-import { transactionField } from '../transactionFields';
+import { TransactionType } from '../transactionType';
+import { TransactionLoader } from '../transactionLoader';
+
+const { fromGlobalId } = require('graphql-relay');
 
 export type CreateTransactionInput = {
     account_id_sender: string;
     account_id_receiver: string;
-    amount: string;
+    amount: number;
 };
 
 const mutation = mutationWithClientMutationId({
@@ -23,14 +26,14 @@ const mutation = mutationWithClientMutationId({
             type: new GraphQLNonNull(GraphQLString),
         },
         amount: {
-            type: new GraphQLNonNull(GraphQLString),
+            type: new GraphQLNonNull(GraphQLInt),
         },
     },
     mutateAndGetPayload: async (args: CreateTransactionInput) => {
         try {
             const transaction = await new Transaction({
-                account_id_sender: args.account_id_sender,
-                account_id_receiver: args.account_id_receiver,
+                account_id_sender: fromGlobalId(args.account_id_sender).id,
+                account_id_receiver: fromGlobalId(args.account_id_receiver).id,
                 amount: args.amount,
             }).save();
 
@@ -40,20 +43,24 @@ const mutation = mutationWithClientMutationId({
             });
 
             return {
-                transaction: transaction._id.toString(),
+                transaction: {
+                    ...transaction.toObject(),
+                    amount: transaction.amount,
+                }
             };
         } catch (error) {
-            if (error) {
-                if (error.code === 11000) {
-                    const field = Object.keys(error.keyPattern)[0];
-                    throw new Error(`${field} already exists. Please check the data.`);
-                }
-            }
             throw error;
         }
     },
     outputFields: {
-        ...transactionField('transaction'),
+        transaction: {
+            type: TransactionType,
+            resolve: async ({ transaction }, _, context) => {
+                if (!transaction) return null;
+                return TransactionLoader.load(context, transaction._id);
+            },
+        },
+        // accountUpdateBalance TODO
     },
 });
 

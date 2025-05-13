@@ -4,11 +4,6 @@ import { Account } from '../account/accountModel';
 
 const Schema = new mongoose.Schema<ITransaction>(
     {
-        ID: {
-            type: String,
-            description: 'The id of the transaction',
-            unique: true,
-        },
         account_id_sender: {
             type: mongoose.Schema.Types.ObjectId,
             description: 'The account id of the sender of the transaction',
@@ -35,7 +30,6 @@ const Schema = new mongoose.Schema<ITransaction>(
 );
 
 export type ITransaction = {
-    ID: string;
     account_id_sender: mongoose.Types.ObjectId;
     account_id_receiver: mongoose.Types.ObjectId;
     amount: mongoose.Schema.Types.Decimal128;
