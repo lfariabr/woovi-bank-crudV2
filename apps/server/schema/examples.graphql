@@ -40,6 +40,23 @@ query {
   }
 }
 
+# Example of query to get transactions
+query {
+  transactions (first: 1) {
+    pageInfo {
+      startCursor
+      endCursor
+    }
+    edges {
+      node {
+        id
+        amount
+        createdAt
+      }
+    }
+  }
+}
+
 ##############
 # MUTATIONS
 ##############
@@ -89,6 +106,23 @@ mutation {
       last_name
       email
       taxId
+    }
+  }
+}
+
+# Example of creating a transaction
+mutation {
+  CreateTransaction(
+    input: {
+      account_id_sender: "QWNjb3VudDo2ODIwOWI0YTczOTMwNWZkYmQ4NmJlZDc="
+      account_id_receiver: "QWNjb3VudDo2ODIwOWIxZWFhMTUwNWMwNTAwMGQzNmM="
+      amount: "100"
+    }
+  ) {
+    transaction {
+      id
+      amount
+      createdAt
     }
   }
 }
