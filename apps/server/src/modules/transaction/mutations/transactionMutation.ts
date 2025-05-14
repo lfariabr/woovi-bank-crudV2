@@ -1,5 +1,7 @@
-import { CreateTransactionMutation } from './CreateTransactionMutation';
+import { SendTransactionMutation } from './sendTransaction';
+import { ReceiveTransactionMutation } from './receiveTransaction';
 
 export const transactionMutation = {
-    CreateTransaction: CreateTransactionMutation,
+    SendTransaction: SendTransactionMutation,
+    ReceiveTransaction: ReceiveTransactionMutation,
 };

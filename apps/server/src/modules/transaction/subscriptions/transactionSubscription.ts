@@ -1,5 +1,5 @@
-import { CreateTransactionSubscription } from './CreateTransactionSubscription';
+import { SendTransactionSubscription } from './SendTransactionSubscription';
 
 export const transactionSubscriptions = {
-	CreateTransaction: CreateTransactionSubscription,
+	SendTransaction: SendTransactionSubscription,
 };

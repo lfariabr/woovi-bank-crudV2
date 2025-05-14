@@ -1,21 +1,20 @@
 import { subscriptionWithClientId } from 'graphql-relay-subscription';
 import { withFilter } from 'graphql-subscriptions';
-
 import { redisPubSub } from '../../pubSub/redisPubSub';
 import { PUB_SUB_EVENTS } from '../../pubSub/pubSubEvents';
 import mongoose from 'mongoose';
 import { Transaction } from '../transactionModel';
 import { TransactionType } from '../transactionType';
 
-type CreateTransactionPayload = {
+type SendTransactionPayload = {
 	transaction: string;
 };
 
 const subscription = subscriptionWithClientId({
-	name: 'CreateTransactionSubscription',
+	name: 'SendTransactionSubscription',
 	subscribe: withFilter(
-		() => redisPubSub.asyncIterator(PUB_SUB_EVENTS.TRANSACTION.CREATED),
-		async (payload: CreateTransactionPayload) => {
+		() => redisPubSub.asyncIterator(PUB_SUB_EVENTS.TRANSACTION.SENT),
+		async (payload: SendTransactionPayload) => {
 			const transaction = await Transaction.findOne({
 				_id: new mongoose.Types.ObjectId(payload.transaction),
 			});
@@ -27,7 +26,7 @@ const subscription = subscriptionWithClientId({
 			return true;
 		}
 	),
-	getPayload: async (obj: CreateTransactionPayload) => {
+	getPayload: async (obj: SendTransactionPayload) => {
 		// console.log('AccountAddedSubscription getPayload', obj);
 		if (!obj || !obj.transaction) return {};
 		return { transaction: obj.transaction };
@@ -46,6 +45,6 @@ const subscription = subscriptionWithClientId({
 	},
 });
 
-export const CreateTransactionSubscription = {
+export const SendTransactionSubscription = {
 	...subscription,
 };

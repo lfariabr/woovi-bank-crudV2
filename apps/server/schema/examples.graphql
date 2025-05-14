@@ -115,13 +115,30 @@ mutation {
   }
 }
 
-# Example of creating a transaction
+# Example of sending a transaction
 mutation {
-  CreateTransaction(
+  SendTransaction(
     input: {
-      account_id_sender: "QWNjb3VudDo2ODIyYTdhNTVjN2E3MTM3OGY1OGZmMDU="
-      account_id_receiver: "QWNjb3VudDo2ODIyYTc5ODVjN2E3MTM3OGY1OGZmMDI="
-      amount: 100
+      account_id_sender: "QWNjb3VudDo2ODIyYTgwNjVjN2E3MTM3OGY1OGZmMTA="
+      account_id_receiver: "QWNjb3VudDo2ODIyYTdhNTVjN2E3MTM3OGY1OGZmMDU="
+      amount: 2000
+    }
+  ) {
+    transaction {
+      id
+      amount
+      createdAt
+    }
+  }
+}
+
+# Example of receiving a transaction
+mutation {
+  ReceiveTransaction(
+    input: {
+      account_id_receiver: "QWNjb3VudDo2ODIyYTdhNTVjN2E3MTM3OGY1OGZmMDU="
+      account_id_sender: "QWNjb3VudDo2ODIyYTgwNjVjN2E3MTM3OGY1OGZmMTA="
+      amount: 2000
     }
   ) {
     transaction {
@@ -181,7 +198,7 @@ subscription {
 
 # Example of subscription to transaction created
 subscription {
-  CreateTransaction(input: {}) {
+  SendTransaction(input: {}) {
     transaction {
       id
       amount
