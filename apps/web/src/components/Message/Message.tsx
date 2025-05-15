@@ -2,8 +2,8 @@ import { Box, Card, Typography } from '@mui/material';
 import { graphql, useFragment } from 'react-relay';
 import { DateTime } from 'luxon';
 
-import { WooviAvatar } from './WooviAvatar';
-import { Message_message$key } from '../__generated__/Message_message.graphql';
+import { WooviAvatar } from '../../Woovi/WooviAvatar';
+import { Message_message$key } from '../../__generated__/Message_message.graphql';
 
 type MessageProps = {
 	message: Message_message$key;
