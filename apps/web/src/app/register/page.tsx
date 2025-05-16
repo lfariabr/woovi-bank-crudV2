@@ -224,9 +224,6 @@ const Register: React.FC = () => {
                                         color: '#03d69d',
                                         textDecoration: 'none',
                                         fontWeight: 500,
-                                        '&:hover': {
-                                            textDecoration: 'underline',
-                                        }
                                     }}
                                 >
                                     Sign in
