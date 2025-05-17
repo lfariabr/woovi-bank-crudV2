@@ -10,3 +10,6 @@ show collections
 # Drop data
 db.Account.dropIndexes()
 db.Account.drop()
+
+db.Transaction.dropIndexes()
+db.Transaction.drop()

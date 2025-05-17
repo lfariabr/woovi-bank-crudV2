@@ -149,6 +149,29 @@ mutation {
   }
 }
 
+# Example of Registering an account via Frontend
+Operation
+mutation Register($input: RegisterInput!) {
+  Register(input: $input) {
+    id
+    email
+    first_name
+    last_name
+    token
+  }
+}
+
+Variables
+{
+  "input": {
+    "email": "1@aexample.com",
+    "password": "password123",
+    "first_name": "Test",
+    "last_name": "User",
+    "taxId": "12345678912",
+    "accountId": "2",
+}
+
 ##############
 # SUBSCRIPTIONS
 ##############

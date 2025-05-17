@@ -54,6 +54,11 @@ export async function sendTransaction(senderId: string, receiverId: string, amou
       await session.abortTransaction();
       session.endSession();
       attempts++;
+      console.log('Transaction failed. Retrying...');
+      // Don't retry for insufficient balance - it won't change
+      if (error.message.includes('Insufficient balance')) {
+        throw error; // Throw original error immediately
+      }
 
       if (attempts >= MAX_RETRIES) {
         throw new Error('Failed to send transaction after multiple attempts');

@@ -1,3 +1,32 @@
+
+type AuthPayload {
+  token: String!
+  account: Account!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  firstName: String
+  lastName: String
+  taxId: String!
+  accountId: String!
+}
+
+type Mutation {
+  login(input: LoginInput!): AuthPayload
+  register(input: RegisterInput!): AuthPayload
+}
+
+type Query {
+  me: Account
+}
+
 type Query {
   accounts(
     after: String
