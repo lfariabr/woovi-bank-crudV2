@@ -8,9 +8,12 @@ import logger from 'koa-logger';
 import { schema } from '../schema/schema';
 import { getContext } from './getContext';
 import { createWebsocketMiddleware } from './websocketMiddleware';
+import { securityHeaders } from '../middleware/securityHeaders';
+import { authenticate } from '../middleware/auth.middleware';
 
 const app = new Koa();
 
+app.use(securityHeaders);
 app.use(cors({ origin: '*' }));
 app.use(logger());
 app.use(
@@ -21,6 +24,7 @@ app.use(
 	})
 );
 
+app.use(authenticate);
 app.use(createWebsocketMiddleware());
 
 const routes = new Router();

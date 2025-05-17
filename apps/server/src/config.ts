@@ -17,10 +17,11 @@ const config = {
 	PORT: ENV.PORT ?? 4000,
 	MONGO_URI: ENV.MONGO_URI ?? '',
 	JWT_SECRET: ENV.JWT_SECRET ?? '',
+	REDIS_HOST: ENV.REDIS_HOST ?? '',
 };
 
 if (!config.JWT_SECRET) {
 	throw new Error('JWT_SECRET is not defined in .env');
-  }
+}
 
 export { config };
