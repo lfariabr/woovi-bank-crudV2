@@ -1,14 +1,21 @@
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { Account } from './accountModel';
+import { config } from '../../config';
+
 
 const SALT_ROUNDS = 10;
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
+
 console.log('Loaded auth.service.ts with bcryptjs!');
+
 export const authService = {
     async hashPassword(password: string): Promise<string> {
         const salt = await bcrypt.genSalt(SALT_ROUNDS);
         return bcrypt.hash(password, salt);
+    },
+
+    async comparePassword(password: string, hash: string): Promise<boolean> {
+        return bcrypt.compare(password, hash);
     },
     
     async validateCredentials(email: string, password: string) {
@@ -18,10 +25,10 @@ export const authService = {
     },
 
     generateToken(accountId: string): string {
-        return jwt.sign({ accountId }, JWT_SECRET, { expiresIn: '1h' });
+        return jwt.sign({ accountId }, config.JWT_SECRET, { expiresIn: '1h' });
     },
 
     verifyToken(token: string) {
-        return jwt.verify(token, JWT_SECRET) as { accountId: string };
+        return jwt.verify(token, config.JWT_SECRET) as { accountId: string };
     }
 };

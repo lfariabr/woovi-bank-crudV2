@@ -5,7 +5,7 @@ export const authenticate = async (ctx: Context, next: () => Promise<any>) => {
   const authHeader = ctx.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    ctx.state.accountId = null;
+    // ctx.state.accountId = null;
     return next();
   }
 
@@ -15,7 +15,8 @@ export const authenticate = async (ctx: Context, next: () => Promise<any>) => {
     const { accountId } = authService.verifyToken(token);
     ctx.state.accountId = accountId;
   } catch (err) {
-    ctx.state.accountId = null;
+    console.error('Token verification failed:', err);
+    // ctx.state.accountId = null;
   }
   
   await next();

@@ -2,48 +2,42 @@ import { GraphQLInputObjectType, GraphQLString, GraphQLNonNull } from 'graphql';
 import { AccountType } from '../accountType';
 import { authService } from '../auth.service';
 import { Account } from '../accountModel';
-
-const RegisterInputType = new GraphQLInputObjectType({
-    name: 'RegisterInput',
-    fields: {
-      email: { type: new GraphQLNonNull(GraphQLString) },
-      password: { type: new GraphQLNonNull(GraphQLString) },
-      first_name: { type: GraphQLString },
-      last_name: { type: GraphQLString },
-      taxId: { type: GraphQLString },
-      accountId: { type: GraphQLString },
-    },
-  });
+import { RegisterInputType } from '../accountType';
+import { AuthPayloadType } from '../accountType';
 
 export const RegisterMutation = {
-    type: AccountType,
+    type: AuthPayloadType,
     args: {
         input: { type: new GraphQLNonNull(RegisterInputType) },
     },
-    resolve: async(_: any, { input }: {
-        input: {
-            email: string;
-            password: string;
-            first_name?: string;
-            last_name?: string;
-            taxId?: string;
-            accountId?: string;
-        }
-    }) => {
-        const { email, password, ...rest } = input;
-        const existing = await Account.findOne({ email });
-        if (existing) {
-            throw new Error('Email already in use... Sorry!');
+    async resolve(_: any, { input }: { input: any }) {
+        const { email, password, first_name, last_name, taxId, accountId } = input;
+        
+        const existingUser = await Account.findOne({ email });
+        if (existingUser) {
+            throw new Error('Email already in use');
         }
 
-        const hashedPassword = await authService.hashPassword(password);
         const account = new Account({
             email,
-            password: hashedPassword,
-            ...rest,
+            password,
+            first_name,
+            last_name,
+            taxId,
+            accountId,
+            balance: 1000,
+            isActive: true,
         });
 
         await account.save();
-        return account;
+
+        const token = authService.generateToken(account._id.toString());
+        const accountObj = account.toObject();
+        accountObj.id = accountObj._id.toString();
+        
+        return {
+            token,
+            account: accountObj
+        };
     },
-}
+};

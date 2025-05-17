@@ -29,10 +29,10 @@ const routes = new Router();
 
 routes.all(
 	'/graphql',
-	graphqlHTTP(() => ({
+	graphqlHTTP((req) => ({
 		schema,
 		graphiql: true,
-		context: getContext(),
+		context: getContext({ req }),
 	}))
 );
 

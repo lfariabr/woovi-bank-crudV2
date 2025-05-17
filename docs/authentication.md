@@ -47,8 +47,8 @@
 # Next Steps
 - Test the authentication flow:
 -- Register a new user (done)
--- Log in to get a token ()
--- Use the token for authenticated requests
+-- Log in to get a token (done)
+-- Use the token for authenticated requests (done)
 
 - Test transactions:
 -- Verify proper error messages for insufficient balance

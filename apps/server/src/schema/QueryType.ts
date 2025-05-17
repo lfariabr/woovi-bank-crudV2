@@ -17,6 +17,7 @@ export const QueryType = new GraphQLObjectType({
 			type: AccountType,
 			description: 'Get the currently auth user',
 			resolve: async (_, __, context) => {
+				console.log('context', context);
 				if (!context.accountId) {
 					throw new Error('Not authenticated');
 				}

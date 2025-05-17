@@ -83,6 +83,10 @@ const Schema = new mongoose.Schema<IAccount>(
 	}
 );
 
+Schema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+	return await authService.comparePassword(this.password, candidatePassword);
+}
+
 // Middleware to hash PWD
 Schema.pre('save', async function(next) {
 	if (!this.isModified('password')) return next();

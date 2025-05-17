@@ -33,8 +33,8 @@ const RegisterInputType = new GraphQLInputObjectType({
 	fields: () => ({
 	  email: { type: new GraphQLNonNull(GraphQLString) },
 	  password: { type: new GraphQLNonNull(GraphQLString) },
-	  firstName: { type: GraphQLString },
-	  lastName: { type: GraphQLString },
+	  first_name: { type: GraphQLString },
+	  last_name: { type: GraphQLString },
 	  taxId: { type: GraphQLString },
 	  accountId: { type: GraphQLString },
 	}),
@@ -45,7 +45,12 @@ const AccountType = new GraphQLObjectType<IAccount>({
 	name: 'Account',
 	description: 'Represents an account',
 	fields: () => ({
-		id: globalIdField('Account'),
+		id: {
+            ...globalIdField('Account'),
+            resolve: (account) => {
+                return account._id ? account._id.toString() : account.id;
+            }
+        },
 		first_name: {
 			type: GraphQLString,
 			resolve: (account) => account.first_name,
