@@ -1,7 +1,7 @@
 module.exports = {
   src: './src',
   artifactDirectory: './src/__generated__',
-  schema: './data/schema.graphql',
+  schema: '../server/schema/schema.graphql',
   exclude: [
     '**/node_modules/**',
     '**/.next/**',

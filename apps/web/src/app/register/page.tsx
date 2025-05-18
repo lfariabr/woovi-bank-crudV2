@@ -1,240 +1,153 @@
-"use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Box, TextField, Button, Typography, Container, Paper, InputAdornment, IconButton, Grid, Alert, CircularProgress } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+'use client';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Box, TextField, Button, Typography, Container, Paper } from '@mui/material';
+import { useRelayEnvironment } from 'react-relay';
+import { commitRegisterMutation } from './user_register_mutation';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const registerSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(4, 'Password must be at least 4 characters'),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  taxId: z.string().min(1, 'Tax ID is required'),
+  accountId: z.string().min(1, 'Account ID is required'),
+});
+
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 const Register: React.FC = () => {
-    const router = useRouter();
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-        name: "",
-        phone: "",
-        taxVat: ""
-    });
-    const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [submitStatus, setSubmitStatus] = useState<{
-        success: boolean;
-        message: string;
-    } | null>(null);
-    
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-    
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSubmitStatus(null);
-        setIsLoading(true);
-        // TODO: Add registration logic here
-        // Add 2 seconds loading animation
-        // print a message to the user at the interface frontend for the user to see
-        // after 2 seconds, redirect to the login page
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // On success
-            setSubmitStatus({
-                success: true,
-                message: 'Registration successful! Welcome. Sit tight while we redirect you to login page...'
-            });
-            
-            // Redirect after showing success message
-            setTimeout(() => {
-                router.push("/login");
-            }, 2500);
-            
-        } catch (error) {
-            setSubmitStatus({
-                success: false,
-                message: 'Registration failed. Please try again.'
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-    
-    return (
-        <Container component="main" maxWidth="md">
-            <Box
-                sx={{
-                    marginY: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
+  const router = useRouter();
+  const environment = useRelayEnvironment();
+  const [error, setError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (data: RegisterFormData) => {
+    setError(null);
+    try {
+      const response = await commitRegisterMutation(environment, data) as any;
+      if (response?.register?.token) {
+        localStorage.setItem('token', response.register.token);
+        router.push('/dashboard');
+      } else {
+        setError('Registration failed. Please check your details.');
+      }
+    } catch (err) {
+      setError('An error occurred during registration. Please try again.');
+      console.error('Register error:', err);
+    }
+  };
+
+  return (
+    <Container component="main" maxWidth="xs">
+      <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Paper elevation={3} sx={{ p: 4, width: '100%', borderRadius: 2 }}>
+          <Typography component="h1" variant="h4" align="center" color="primary" gutterBottom>
+            Create Account
+          </Typography>
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 4 }}>
+            Register for a new Woovi account
+          </Typography>
+          {error && (
+            <Typography color="error" align="center" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+          )}
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              autoComplete="email"
+              autoFocus
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              disabled={isSubmitting}
+              {...register('email')}
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="new-password"
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              disabled={isSubmitting}
+              {...register('password')}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              label="First Name"
+              id="first_name"
+              error={!!errors.first_name}
+              helperText={errors.first_name?.message}
+              disabled={isSubmitting}
+              {...register('first_name')}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              label="Last Name"
+              id="last_name"
+              error={!!errors.last_name}
+              helperText={errors.last_name?.message}
+              disabled={isSubmitting}
+              {...register('last_name')}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Tax ID"
+              id="taxId"
+              error={!!errors.taxId}
+              helperText={errors.taxId?.message}
+              disabled={isSubmitting}
+              {...register('taxId')}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Account ID"
+              id="accountId"
+              error={!!errors.accountId}
+              helperText={errors.accountId?.message}
+              disabled={isSubmitting}
+              {...register('accountId')}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={isSubmitting}
+              sx={{ mt: 3, mb: 2, py: 1.5, borderRadius: 1, textTransform: 'none', fontSize: '1rem', fontWeight: 500 }}
             >
-                <Paper 
-                    elevation={3} 
-                    sx={{ 
-                        p: { xs: 3, md: 4 },
-                        width: '100%',
-                        borderRadius: 2,
-                        backgroundColor: 'background.paper',
-                    }}
-                >
-                    <Typography component="h1" variant="h4" align="center" color="primary" gutterBottom>
-                        Create Your Account
-                    </Typography>
-
-                    {/* Status Message */}
-                    {submitStatus && (
-                        <Alert 
-                            severity={submitStatus.success ? 'success' : 'error'}
-                            sx={{ mb: 2 }}
-                        >
-                            {submitStatus.message}
-                        </Alert>
-                    )}
-
-                    <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 4 }}>
-                        Sell more, make your client's life easier with Woovi!
-                    </Typography>
-
-                    {/* Loading Animation */}
-                    {isLoading && (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
-                            <CircularProgress />
-                        </Box>
-                    )}
-                    
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    id="name"
-                                    label="Full Name"
-                                    name="name"
-                                    autoComplete="name"
-                                    autoFocus
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    id="email"
-                                    label="Email Address"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    name="password"
-                                    label="Password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    id="password"
-                                    autoComplete="new-password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    aria-label="toggle password visibility"
-                                                    onClick={() => setShowPassword(!showPassword)}
-                                                    edge="end"
-                                                >
-                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    id="phone"
-                                    label="Phone Number"
-                                    name="phone"
-                                    type="tel"
-                                    autoComplete="tel"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                    placeholder="(DDD) 00000-0000"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    margin="normal"
-                                    required
-                                    fullWidth
-                                    id="taxVat"
-                                    label="CPF/CNPJ"
-                                    name="taxVat"
-                                    value={formData.taxVat}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                    placeholder="000.000.000-00"
-                                />
-                            </Grid>
-                        </Grid>
-
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ 
-                                mt: 3, 
-                                mb: 2,
-                                py: 1.5,
-                                borderRadius: 1,
-                                textTransform: 'none',
-                                fontSize: '1rem',
-                                fontWeight: 500,
-                            }}
-                        >
-                            Create Account
-                        </Button>
-                        
-                        <Box sx={{ textAlign: 'center', mt: 2 }}>
-                            <Typography variant="body2" color="text.secondary">
-                                Already have an account?{' '}
-                                <Link 
-                                    href="/login" 
-                                    style={{ 
-                                        color: '#03d69d',
-                                        textDecoration: 'none',
-                                        fontWeight: 500,
-                                    }}
-                                >
-                                    Sign in
-                                </Link>
-                            </Typography>
-                        </Box>
-                    </Box>
-                </Paper>
-            </Box>
-        </Container>
-    );
+              {isSubmitting ? 'Registering...' : 'Register'}
+            </Button>
+          </Box>
+        </Paper>
+      </Box>
+    </Container>
+  );
 };
 
 export default Register;

@@ -7,13 +7,14 @@
 		"config:local": "cp .env.example .env",
 		"dev": "next dev",
 		"lint": "next lint",
-		"relay": "relay-compiler",
+		"relay": "relay-compiler --src ./src --schema ../../schema.graphql --language typescript --artifactDirectory ./src/__generated__ src/**/*.{ts,tsx}",
 		"start": "next start"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.11.1",
 		"@emotion/server": "^11.11.0",
 		"@emotion/styled": "^11.11.0",
+		"@hookform/resolvers": "^5.0.1",
 		"@mui/icons-material": "^5.14.18",
 		"@mui/material": "^5.14.19",
 		"@woovi-playground/ui": "*",
@@ -22,8 +23,10 @@
 		"next": "latest",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
+		"react-hook-form": "^7.56.4",
 		"react-relay": "^15.0.0",
-		"relay-runtime": "^15.0.0"
+		"relay-runtime": "^15.0.0",
+		"zod": "^3.24.4"
 	},
 	"devDependencies": {
 		"@types/luxon": "^3.3.0",

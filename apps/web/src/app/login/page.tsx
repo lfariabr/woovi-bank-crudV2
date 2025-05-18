@@ -4,17 +4,51 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Box, TextField, Button, Typography, Container, Paper, InputAdornment, IconButton } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useRelayEnvironment } from 'react-relay';
+import { commitLoginMutation } from './user_login_mutation';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(4, 'Password must be at least 4 characters'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
     const router = useRouter();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const environment = useRelayEnvironment();
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        // TODO: Add authentication logic here
-        router.push("/dashboard");
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<LoginFormData>({
+        resolver: zodResolver(loginSchema),
+    });
+
+    const onSubmit = async (data: LoginFormData) => {
+        try {
+            const response = await commitLoginMutation(
+                environment,
+                data.email,
+                data.password
+            ) as { login?: { token?: string } };
+            
+            if (response?.login?.token) {
+                localStorage.setItem('token', response.login.token);
+                router.push('/dashboard');
+            } else {
+                setError('Login failed. Please check your credentials.');
+            }
+        } catch (err) {
+            setError('An error occurred during login. Please try again.');
+            console.error('Login error:', err);
+        }
     };
     
     return (
@@ -43,18 +77,25 @@ const Login: React.FC = () => {
                         Sign in to your Woovi account
                     </Typography>
                     
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    {error && (
+                        <Typography color="error" align="center" sx={{ mb: 2 }}>
+                            {error}
+                        </Typography>
+                    )}
+                    
+                    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
                         <TextField
                             margin="normal"
                             required
                             fullWidth
                             id="email"
                             label="Email Address"
-                            name="email"
                             autoComplete="email"
                             autoFocus
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
+                            disabled={isSubmitting}
+                            {...register('email')}
                             variant="outlined"
                             sx={{ mb: 2 }}
                         />
@@ -62,14 +103,14 @@ const Login: React.FC = () => {
                             margin="normal"
                             required
                             fullWidth
-                            name="password"
                             label="Password"
                             type={showPassword ? 'text' : 'password'}
                             id="password"
                             autoComplete="current-password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            variant="outlined"
+                            error={!!errors.password}
+                            helperText={errors.password?.message}
+                            disabled={isSubmitting}
+                            {...register('password')}
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -88,6 +129,7 @@ const Login: React.FC = () => {
                             type="submit"
                             fullWidth
                             variant="contained"
+                            disabled={isSubmitting}
                             sx={{ 
                                 mt: 3, 
                                 mb: 2,
@@ -98,7 +140,7 @@ const Login: React.FC = () => {
                                 fontWeight: 500,
                             }}
                         >
-                            Sign In
+                            {isSubmitting ? 'Signing in...' : 'Sign In'}
                         </Button>
                         <Box sx={{ textAlign: 'center', mt: 2 }}>
                             <Typography variant="body2" color="text.secondary">

@@ -8,7 +8,7 @@ import pageQuery, { pages_PageQuery } from '../__generated__/pages_PageQuery.gra
 import { Message } from '../components/Message/Message';
 import { MessageList } from '../components/Message/MessageList';
 import { useMessageAddedSubscription } from '../components/subscriptions/useMessageAddedSubscription';
-import Login from './../app/login/page';
+import Login from '../app/login/page';
 
 const IndexQuery = graphql`
 	query pages_PageQuery($first: Int!, $after: String) {
@@ -44,11 +44,11 @@ const Index = ({ queryRefs }: IndexProps) => {
 	return (
 		<Layout>
 			{/* <Login /> */}
-			{/* <MessageList>
+			<MessageList>
 				{data.messages.edges.map(({ node }) => (
 					<Message key={node.id} message={node} />
 				))}
-			</MessageList> */}
+			</MessageList>
 		</Layout>
 	);
 };
