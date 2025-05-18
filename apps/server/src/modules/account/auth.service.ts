@@ -3,28 +3,41 @@ import * as jwt from 'jsonwebtoken';
 import { Account } from './accountModel';
 import { config } from '../../config';
 import { redisClient } from '../../modules/pubSub/redisPubSub';
+const SALT_ROUNDS = 10; // Adds random piece of data to password before hashing
 
-// Adds random piece of data to password before hashing
-const SALT_ROUNDS = 10;
-
-console.log('Loaded auth.service.ts with bcryptjs!');
-
+console.log('Loaded auth.service.ts with bcryptjs! 🛡️');
 export const authService = {
+    /**
+     * Hashes a password using bcrypt
+     * Returns a Promise that resolves to the hashed password
+     */
     async hashPassword(password: string): Promise<string> {
         const salt = await bcrypt.genSalt(SALT_ROUNDS);
         return bcrypt.hash(password, salt);
     },
 
+    /**
+     * Compares a password with a hash using bcrypt
+     * Returns a Promise that resolves to true if the password matches the hash, false otherwise
+     */
     async comparePassword(password: string, hash: string): Promise<boolean> {
         return bcrypt.compare(password, hash);
     },
     
+    /**
+     * Validates credentials (email and password) and returns the account if valid
+     * Returns the account if valid, null otherwise
+     */
     async validateCredentials(email: string, password: string) {
         const account = await Account.findOne({ email }).select('+password');
         if (!account) return null;
         return await bcrypt.compare(password, account.password) ? account : null;
     },
 
+    /**
+     * Invalidates a token by adding it to the blacklist
+     * Returns a Promise that resolves when the token is invalidated
+     */
     async invalidateToken(token: string): Promise<void> {
         try {
             const decoded = jwt.verify(token, config.JWT_SECRET) as { exp: number };
@@ -39,6 +52,10 @@ export const authService = {
         }
     },
 
+    /**
+     * Checks if a token is blacklisted
+     * Returns a Promise that resolves to true if the token is blacklisted, false otherwise
+     */
     async isTokenBlacklisted(token: string): Promise<boolean> {
         try {
             // Check with the same key format used in invalidateToken
@@ -50,10 +67,18 @@ export const authService = {
         }
     },
 
+    /**
+     * Generates a JWT token for a given account ID
+     * Returns a JWT token
+     */
     generateToken(accountId: string): string {
         return jwt.sign({ accountId }, config.JWT_SECRET, { expiresIn: '1h' });
     },
 
+    /**
+     * Verifies a JWT token and returns the account ID
+     * Returns the account ID if the token is valid, throws an error otherwise
+     */
     verifyToken(token: string): { accountId: string } {
         try {
           return jwt.verify(token, config.JWT_SECRET) as { accountId: string };

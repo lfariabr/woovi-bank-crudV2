@@ -17,24 +17,19 @@ const redisOptions = {
     }
 };
 
-// Create the Redis client
+// Create the Redis client and PubSub instance
 export const redisClient = new Redis(redisOptions);
-
-// Create PubSub with the same Redis client
 export const redisPubSub = new RedisPubSub({
     publisher: new Redis(redisOptions),
     subscriber: new Redis(redisOptions),
     connection: redisOptions,
 });
 
-// Add connection logging
 redisClient.on('connect', () => {
     const address = `${redisOptions.host}:${redisOptions.port}`;
-    console.log(`✅ Connected to Redis at ${address}`);
 });
 
 redisClient.on('ready', () => {
-    console.log('✅ Redis client ready');
 });
 
 redisClient.on('error', (err) => {
@@ -44,13 +39,3 @@ redisClient.on('error', (err) => {
 redisClient.on('reconnecting', () => {
     console.log('🔄 Redis reconnecting...');
 });
-
-// Test the connection on startup
-(async () => {
-    try {
-        const pong = await redisClient.ping();
-        console.log('🏓 Redis ping:', pong);
-    } catch (err) {
-        console.error('❌ Failed to ping Redis:', err.message);
-    }
-})();

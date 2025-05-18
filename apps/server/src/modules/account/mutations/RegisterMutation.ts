@@ -1,5 +1,4 @@
-import { GraphQLInputObjectType, GraphQLString, GraphQLNonNull } from 'graphql';
-import { AccountType } from '../accountType';
+import { GraphQLNonNull } from 'graphql';
 import { authService } from '../auth.service';
 import { Account } from '../accountModel';
 import { RegisterInputType } from '../accountType';

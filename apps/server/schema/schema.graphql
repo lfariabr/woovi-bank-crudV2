@@ -21,6 +21,9 @@ input RegisterInput {
 type Mutation {
   login(input: LoginInput!): AuthPayload
   register(input: RegisterInput!): AuthPayload
+  AccountAdd(input: AccountAddInput!): AccountAddPayload
+  AccountUpdate(input: AccountUpdateInput!): AccountUpdatePayload
+  MessageAdd(input: MessageAddInput!): MessageAddPayload
 }
 
 type Query {
@@ -57,6 +60,8 @@ type Account implements Node {
   taxId: String
   accountId: String
   createdAt: String
+  isActive: Boolean
+  balance: Float
 }
 
 type AccountConnection {
@@ -71,6 +76,18 @@ type AccountEdge {
 
 type AccountAddPayload {
   account: Account
+  clientMutationId: String
+}
+
+input AccountUpdateInput {
+  id: ID!
+  first_name: String
+  last_name: String
+  email: String
+  taxId: String
+  accountId: String
+  isActive: Boolean
+  balance: Float
   clientMutationId: String
 }
 
@@ -139,12 +156,6 @@ interface Node {
   id: ID!
 }
 
-type Mutation {
-  AccountAdd(input: AccountAddInput!): AccountAddPayload
-  AccountUpdate(input: AccountUpdateInput!): AccountUpdatePayload
-  MessageAdd(input: MessageAddInput!): MessageAddPayload
-}
-
 type AccountUpdatePayload {
   account: Account
   clientMutationId: String
@@ -164,6 +175,10 @@ type Subscription {
   AccountAdded(input: AccountAddedInput!): AccountAddedPayload
   AccountUpdated(input: AccountUpdatedInput!): AccountUpdatedPayload
   MessageAdded(input: MessageAddedInput!): MessageAddedPayload
+}
+
+input AccountUpdatedInput {
+  clientSubscriptionId: String
 }
 
 type AccountAddedPayload {

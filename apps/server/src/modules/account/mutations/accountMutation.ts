@@ -7,7 +7,7 @@ import { LogoutMutation } from './LogoutMutation';
 export const accountMutation = {
     AccountAdd: AccountAddMutation,
     AccountUpdate: AccountUpdateMutation,
-    Register: RegisterMutation,
-    Login: LoginMutation,
-    Logout: LogoutMutation,
+    register: RegisterMutation,
+    login: LoginMutation,
+    logout: LogoutMutation,
 };

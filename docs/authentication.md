@@ -52,13 +52,19 @@
 -- Test expiration of the token (done)
 -- Verify old tokens become invalid after logout (done)
 -- Add security headers (done)
+
+# In Progress
 -- Add Rate Limiting (leaky bucket)
 
-- Test transactions:
+# TODO
+-- Add Password Reset
+-- Add Email Verification
+
+# Test transactions:
 -- Verify proper error messages for insufficient balance
 -- Confirm successful transactions
 
-- Consider adding:
+# Consider adding:
 -- Password reset functionality
 -- Email verification
 -- Rate limiting for auth endpoints
@@ -68,33 +74,33 @@
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "mutation { Login(input: { email: \"test7@example.com\", password: \"test7test7\" }) { token account { id email } } }"
+    "query": "mutation { login(input: { email: \"test7@example.com\", password: \"test7test7\" }) { token account { id email } } }"
   }'
 
 # Step 2: Get user info
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer TOKEN" \
+  -H "Authorization: Bearer [TOKEN]" \
   -d '{"query": "{ me { id email } }"}'
 
 # Step 3: Logout
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "mutation { Logout(input: { token: \"TOKEN\" }) { success } }"
+    "query": "mutation { logout(input: { token: \"[TOKEN]\" }) { success } }"
   }'
 
 # Step 4: Try to Get user info after logout
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer TOKEN" \
+  -H "Authorization: Bearer [TOKEN]" \
   -d '{"query": "{ me { id email } }"}'
 
 # Step 5: See all blacklisted tokens
-redis-cli KEYS "blacklist:*"
+redis-cli -p 6381 KEYS "blacklist:*"
 
 # Step 6: Check specific token (replace YOUR_TOKEN)
-redis-cli GET "blacklist:TOKEN"
+redis-cli -p 6381 GET "blacklist:[TOKEN]"
 
 
 TOKEN=$(node -e "console.log(require('jsonwebtoken').sign({accountId: '6827fbf60eed6bf60501ed99'}, 'your_super_secure_secret_key_here_change_this_in_production', {expiresIn: 2}))") && echo "Token: $TOKEN" && sleep 10 && curl -X POST http://localhost:4000/graphql -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d '{"query": "{ me { id email } }"}'
