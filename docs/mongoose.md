@@ -13,3 +13,6 @@ db.Account.drop()
 
 db.Transaction.dropIndexes()
 db.Transaction.drop()
+
+# Run MongoDB in background mode
+mongod --port 27018 --dbpath ~/mongodb-data --fork --logpath ~/mongodb-data/mongod.log

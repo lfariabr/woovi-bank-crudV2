@@ -18,13 +18,33 @@
 }
 
 .navLinks {
-    list-style: none;
     display: flex;
     gap: 1.5rem;
-    font-weight: 500;
-    font-size: 0.9rem;
+    align-items: center;
+    list-style: none;
     margin: 0;
     padding: 0;
+}
+
+.logoutButton {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.logoutButton:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.userEmail {
+    margin-left: 1rem;
+    opacity: 0.8;
+    font-size: 0.9em;
 }
 
 .navLinks li {
