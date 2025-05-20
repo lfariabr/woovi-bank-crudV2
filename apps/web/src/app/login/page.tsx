@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Box, TextField, Button, Typography, Container, Paper, InputAdornment, IconButton } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useRelayEnvironment } from 'react-relay';
-import { commitLoginMutation } from './user_login_mutation';
+import { useMutation } from 'react-relay';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { LOGIN_MUTATION } from './LoginMutation';
+import type { LoginMutation } from '../../__generated__/LoginMutation.graphql';
+import { authStore } from '../../lib/auth-store';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -19,7 +21,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
     const router = useRouter();
-    const environment = useRelayEnvironment();
+    const [commitLogin, isPending] = useMutation<LoginMutation>(LOGIN_MUTATION);
+
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
     
@@ -31,26 +34,39 @@ const Login: React.FC = () => {
         resolver: zodResolver(loginSchema),
     });
 
-    const onSubmit = async (data: LoginFormData) => {
-        try {
-            const response = await commitLoginMutation(
-                environment,
-                data.email,
-                data.password
-            ) as { login?: { token?: string } };
-            
-            if (response?.login?.token) {
-                localStorage.setItem('token', response.login.token);
-                router.push('/dashboard');
-            } else {
-                setError('Login failed. Please check your credentials.');
-            }
-        } catch (err) {
-            setError('An error occurred during login. Please try again.');
-            console.error('Login error:', err);
-        }
+    const onSubmit = (data: LoginFormData) => {
+        setError(null);
+        commitLogin({
+            variables: {
+                input: {
+                    email: data.email,
+                    password: data.password
+                }
+            },
+            onCompleted: (response, errors) => {
+                if (errors) {
+                    setError('⚠️ Invalid email or password');
+                    return;
+                }
+                if (response.login?.token) {
+                    authStore.setState({
+                        token: response.login.token,
+                        user: response.login.account,
+                    });
+                    // localStorage.setItem('token', response.login.token);
+                    router.push('/dashboard');
+                }
+            },
+            onError: (error) => {
+                console.error('Login error:', error);
+                if (error.message?.includes('Invalid credentials')) {
+                    setError('⚠️ Invalid email or password');
+                } else {
+                    setError('⚠️ An error occurred during login. Please try again.');
+                }
+            },
+        });
     };
-    
     return (
         <Container component="main" maxWidth="xs">
             <Box
@@ -129,7 +145,7 @@ const Login: React.FC = () => {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            disabled={isSubmitting}
+                            disabled={isPending}
                             sx={{ 
                                 mt: 3, 
                                 mb: 2,

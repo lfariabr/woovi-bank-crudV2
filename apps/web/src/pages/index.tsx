@@ -43,12 +43,12 @@ const Index = ({ queryRefs }: IndexProps) => {
 
 	return (
 		<Layout>
-			{/* <Login /> */}
-			<MessageList>
+			<Login />
+			{/* <MessageList>
 				{data.messages.edges.map(({ node }) => (
 					<Message key={node.id} message={node} />
 				))}
-			</MessageList>
+			</MessageList> */}
 		</Layout>
 	);
 };
