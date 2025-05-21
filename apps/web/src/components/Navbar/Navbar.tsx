@@ -58,6 +58,14 @@ const Navbar: React.FC = () => {
                             </Link>
                         </li>
                         <li>
+                            <Link 
+                                href="/transactions" 
+                                className={pathname === '/transactions' ? styles.active : ''}
+                            >
+                                Transactions
+                            </Link>
+                        </li>
+                        <li>
                             <button 
                                 onClick={handleLogout}
                                 className={styles.logoutButton}

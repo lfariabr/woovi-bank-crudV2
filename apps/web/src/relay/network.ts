@@ -47,15 +47,19 @@ function createNetwork() {
  * https://relay.dev/docs/en/quick-start-guide#relay-environment.
  */
 
-const GRAPHQL_ENPOINT = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT as string;
+const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT as string;
 
 async function networkFetch(
 	params: RequestParameters,
 	variables: Variables,
 	headers?: HeadersInit
 ) {
+	console.log('[Relay Network] fetchFunction called.');
+	console.log('[Relay Network] params.name:', params.name);
+	console.log('[Relay Network] params.text (Query String):', params.text); // << VERY IMPORTANT
+	console.log('[Relay Network] variables:', JSON.stringify(variables, null, 2));
 	// Fetch data from GraphQL API:
-	const response = await fetch(GRAPHQL_ENPOINT, {
+	const response = await fetch(GRAPHQL_ENDPOINT, {
 		method: 'POST',
 		headers: {
 			...headers,

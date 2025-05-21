@@ -1,4 +1,42 @@
+
+type AuthPayload {
+  token: String!
+  account: Account!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  first_name: String
+  last_name: String
+  taxId: String!
+  accountId: String!
+}
+
+type Mutation {
+  login(input: LoginInput!): AuthPayload
+  register(input: RegisterInput!): AuthPayload
+  AccountAdd(input: AccountAddInput!): AccountAddPayload
+  AccountUpdate(input: AccountUpdateInput!): AccountUpdatePayload
+  MessageAdd(input: MessageAddInput!): MessageAddPayload
+}
+
 type Query {
+  me: Account
+}
+
+type Query {
+  accounts(
+    after: String
+    first: Int
+    before: String
+    last: Int
+  ): AccountConnection
   messages(
     """Returns the items in the list that come after the specified cursor."""
     after: String
@@ -12,6 +50,63 @@ type Query {
     """Returns the last n items from the list."""
     last: Int
   ): MessageConnection
+}
+
+type Account implements Node {
+  id: ID!
+  first_name: String
+  last_name: String
+  email: String
+  taxId: String
+  accountId: String
+  createdAt: String
+  isActive: Boolean
+  balance: Float
+}
+
+type AccountConnection {
+  pageInfo: PageInfo!
+  edges: [AccountEdge]
+}
+
+type AccountEdge {
+  node: Account
+  cursor: String!
+}
+
+type AccountAddPayload {
+  account: Account
+  clientMutationId: String
+}
+
+input AccountUpdateInput {
+  id: ID!
+  first_name: String
+  last_name: String
+  email: String
+  taxId: String
+  accountId: String
+  isActive: Boolean
+  balance: Float
+  clientMutationId: String
+}
+
+input AccountAddInput {
+  first_name: String!
+  last_name: String!
+  email: String!
+  taxId: String!
+  accountId: String!
+  clientMutationId: String
+}
+
+type AccountAddedPayload {
+  account: Account
+  clientSubscriptionId: String
+}
+
+input AccountAddedInput {
+  clientSubscriptionId: String
 }
 
 """A connection to a list of items."""
@@ -61,8 +156,9 @@ interface Node {
   id: ID!
 }
 
-type Mutation {
-  MessageAdd(input: MessageAddInput!): MessageAddPayload
+type AccountUpdatePayload {
+  account: Account
+  clientMutationId: String
 }
 
 type MessageAddPayload {
@@ -76,7 +172,24 @@ input MessageAddInput {
 }
 
 type Subscription {
+  AccountAdded(input: AccountAddedInput!): AccountAddedPayload
+  AccountUpdated(input: AccountUpdatedInput!): AccountUpdatedPayload
   MessageAdded(input: MessageAddedInput!): MessageAddedPayload
+  TransactionAdded(input: TransactionAddedInput!): TransactionAddedPayload
+}
+
+input AccountUpdatedInput {
+  clientSubscriptionId: String
+}
+
+type AccountAddedPayload {
+  account: Account
+  clientSubscriptionId: String
+}
+
+type AccountUpdatedPayload {
+  account: Account
+  clientSubscriptionId: String
 }
 
 type MessageAddedPayload {
@@ -85,5 +198,62 @@ type MessageAddedPayload {
 }
 
 input MessageAddedInput {
+  clientSubscriptionId: String
+}
+
+###############
+# Transaction #
+###############
+
+type Transaction implements Node {
+  id: ID!
+  amount: Float!
+  account_id_sender: String!
+  account_id_receiver: String!
+  createdAt: String!
+}
+
+type TransactionConnection {
+  pageInfo: PageInfo!
+  edges: [TransactionEdge]
+}
+
+type TransactionEdge {
+  node: Transaction
+  cursor: String!
+}
+
+input SendTransactionInput {
+  accountIdReceiver: String!
+  amount: Float!
+  clientMutationId: String
+}
+
+type SendTransactionPayload {
+  transaction: Transaction
+  clientMutationId: String
+}
+
+# Update existing Query type to include transactions field
+extend type Query {
+  transactions(
+    after: String
+    first: Int
+    before: String
+    last: Int
+  ): TransactionConnection
+}
+
+# Update existing Mutation type to include sendTransaction
+extend type Mutation {
+  sendTransaction(input: SendTransactionInput!): SendTransactionPayload
+}
+
+input TransactionAddedInput {
+  clientSubscriptionId: String
+}
+
+type TransactionAddedPayload {
+  transaction: Transaction
   clientSubscriptionId: String
 }
