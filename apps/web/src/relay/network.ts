@@ -54,10 +54,6 @@ async function networkFetch(
 	variables: Variables,
 	headers?: HeadersInit
 ) {
-	console.log('[Relay Network] fetchFunction called.');
-	console.log('[Relay Network] params.name:', params.name);
-	console.log('[Relay Network] params.text (Query String):', params.text); // << VERY IMPORTANT
-	console.log('[Relay Network] variables:', JSON.stringify(variables, null, 2));
 	// Fetch data from GraphQL API:
 	const response = await fetch(GRAPHQL_ENDPOINT, {
 		method: 'POST',

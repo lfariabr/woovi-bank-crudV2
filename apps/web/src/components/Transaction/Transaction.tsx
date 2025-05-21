@@ -5,7 +5,9 @@ import { Transaction_transaction$key } from '../../__generated__/Transaction_tra
 
 type TransactionProps = {
   transaction: Transaction_transaction$key;
-  currentUserAccountId: string;
+  account_id_sender: string;
+  account_id_receiver: string;
+  amount: number;
 };
 
 export const Transaction = (props: TransactionProps) => {
@@ -22,7 +24,7 @@ export const Transaction = (props: TransactionProps) => {
     props.transaction
   );
 
-  const isIncoming = transaction.account_id_receiver === props.currentUserAccountId;
+  const isIncoming = transaction.account_id_receiver === props.account_id_receiver;
   const formattedDate = DateTime.fromISO(transaction.createdAt).toFormat('dd/MM/yyyy HH:mm');
   
   return (

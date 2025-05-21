@@ -38,18 +38,20 @@ type Query {
     last: Int
   ): AccountConnection
   messages(
-    """Returns the items in the list that come after the specified cursor."""
     after: String
-
-    """Returns the first n items from the list."""
     first: Int
-
-    """Returns the items in the list that come before the specified cursor."""
     before: String
-
-    """Returns the last n items from the list."""
     last: Int
   ): MessageConnection
+  transactions(
+    after: String
+    first: Int
+    before: String
+    last: Int
+    account_id_sender: String
+    account_id_receiver: String
+    amount: Float
+  ): TransactionConnection
 }
 
 type Account implements Node {
@@ -109,50 +111,30 @@ input AccountAddedInput {
   clientSubscriptionId: String
 }
 
-"""A connection to a list of items."""
 type MessageConnection {
-  """Information to aid in pagination."""
   pageInfo: PageInfo!
-
-  """A list of edges."""
   edges: [MessageEdge]
 }
 
-"""Information about pagination in a connection."""
 type PageInfo {
-  """When paginating forwards, are there more items?"""
   hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
   hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
   startCursor: String
-
-  """When paginating forwards, the cursor to continue."""
   endCursor: String
 }
 
-"""An edge in a connection."""
 type MessageEdge {
-  """The item at the end of the edge"""
   node: Message
-
-  """A cursor for use in pagination"""
   cursor: String!
 }
 
-"""Represents a message"""
 type Message implements Node {
-  """The ID of an object"""
   id: ID!
   content: String
   createdAt: String
 }
 
-"""An object with an ID"""
 interface Node {
-  """The id of the object."""
   id: ID!
 }
 
@@ -175,6 +157,7 @@ type Subscription {
   AccountAdded(input: AccountAddedInput!): AccountAddedPayload
   AccountUpdated(input: AccountUpdatedInput!): AccountUpdatedPayload
   MessageAdded(input: MessageAddedInput!): MessageAddedPayload
+  TransactionAdded(input: TransactionAddedInput!): TransactionAddedPayload
 }
 
 input AccountUpdatedInput {
@@ -197,5 +180,51 @@ type MessageAddedPayload {
 }
 
 input MessageAddedInput {
+  clientSubscriptionId: String
+}
+
+###############
+# Transaction #
+###############
+
+type Transaction implements Node {
+  id: ID!
+  amount: Float!
+  account_id_sender: String!
+  account_id_receiver: String!
+  createdAt: String!
+}
+
+type TransactionConnection {
+  pageInfo: PageInfo!
+  edges: [TransactionEdge]
+}
+
+type TransactionEdge {
+  node: Transaction
+  cursor: String!
+}
+
+input SendTransactionInput {
+  accountIdReceiver: String!
+  amount: Float!
+  clientMutationId: String
+}
+
+type SendTransactionPayload {
+  transaction: Transaction
+  clientMutationId: String
+}
+
+extend type Mutation {
+  sendTransaction(input: SendTransactionInput!): SendTransactionPayload
+}
+
+input TransactionAddedInput {
+  clientSubscriptionId: String
+}
+
+type TransactionAddedPayload {
+  transaction: Transaction
   clientSubscriptionId: String
 }

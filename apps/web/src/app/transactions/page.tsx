@@ -9,7 +9,19 @@ import { TransactionsList } from '../../components/Transaction/TransactionsList'
 import type { TransactionsQuery as TransactionsQueryType } from '../../__generated__/TransactionsQuery.graphql';
 import { TRANSACTIONS_QUERY } from './TransactionsQuery';
 
-const TransactionsPage: React.FC = () => {
+type TransactionsPageProps = {
+  currentUserAccountId: string;
+  account_id_sender?: string;
+  account_id_receiver?: string;
+  amount?: number;
+};
+
+const TransactionsPage: React.FC<TransactionsPageProps> = ({
+  currentUserAccountId,
+  account_id_sender,
+  account_id_receiver,
+  amount
+}) => {
   const { user, token } = authStore.getState();
   const [queryRef, loadQuery] = useQueryLoader<TransactionsQueryType>(TRANSACTIONS_QUERY);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -25,13 +37,15 @@ const TransactionsPage: React.FC = () => {
         loadQuery({ 
           first: 10, 
           after: cursor,
-          account_id_sender: user.id
+          account_id_sender: user.id,
+          account_id_receiver: account_id_receiver && account_id_receiver.trim() !== '' ? account_id_receiver : undefined, 
+          amount: amount && amount > 0 ? amount : undefined
         });
       } catch (error) {
         console.error("Error loading transactions query:", error);
       }
     }
-  }, [token, loadQuery, cursor, user]);
+  }, [token, loadQuery, cursor, user, account_id_receiver, amount]);
 
   if (!isClient) {
     return (
@@ -87,7 +101,7 @@ const TransactionsPage: React.FC = () => {
   );
 };
 
-// Separate component for transaction content to use Suspense
+// Separate component for transaction content using Suspense
 function TransactionContent({ 
   queryRef, 
   currentUserAccountId 
@@ -106,6 +120,9 @@ function TransactionContent({
     <TransactionsList 
       query={data} 
       currentUserAccountId={currentUserAccountId} 
+      account_id_sender={currentUserAccountId}
+      account_id_receiver=""
+      amount={0}
     />
   );
 }

@@ -13,11 +13,15 @@ const TRANSACTIONS_FRAGMENT = graphql`
     first: { type: "Int!" }
     after: { type: "String" }
     account_id_sender: { type: "String" }
+    account_id_receiver: { type: "String" }
+    amount: { type: "Float" }
   ) {
     transactions(
       first: $first, 
       after: $after,
       account_id_sender: $account_id_sender
+      account_id_receiver: $account_id_receiver
+      amount: $amount
     )
       @connection(key: "TransactionsList_transactions") {
       edges {
@@ -37,11 +41,17 @@ const TRANSACTIONS_FRAGMENT = graphql`
 type TransactionsListProps = {
   query: TransactionsList_query$key;
   currentUserAccountId: string;
+  account_id_sender: string;
+  account_id_receiver: string;
+  amount: number;
 };
 
 export const TransactionsList = ({ 
   query,
-  currentUserAccountId 
+  currentUserAccountId,
+  account_id_sender,
+  account_id_receiver,
+  amount 
 }: TransactionsListProps) => {
   const { data, loadNext, isLoadingNext, hasNext } = usePaginationFragment(
     TRANSACTIONS_FRAGMENT,
@@ -79,7 +89,9 @@ export const TransactionsList = ({
           <Transaction
             key={edge.node.id}
             transaction={edge.node}
-            currentUserAccountId={currentUserAccountId}
+            account_id_sender={account_id_sender}
+            account_id_receiver={account_id_receiver}
+            amount={amount}
           />
         ) : null
 )}
