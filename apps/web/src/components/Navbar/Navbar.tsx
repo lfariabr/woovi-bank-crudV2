@@ -51,6 +51,14 @@ const Navbar: React.FC = () => {
                     <>
                         <li>
                             <Link 
+                                className={pathname === '/admin' ? styles.active : ''}
+                                href="/admin"
+                            >
+                                Admin
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
                                 href="/dashboard" 
                                 className={pathname === '/dashboard' ? styles.active : ''}
                             >
@@ -65,17 +73,17 @@ const Navbar: React.FC = () => {
                                 Transactions
                             </Link>
                         </li>
-                        <li>
-                            <button 
-                                onClick={handleLogout}
-                                className={styles.logoutButton}
-                            >
-                                Logout
-                            </button>
-                        </li>
+
                         {user?.email && (
                             <li className={styles.userEmail}>
-                                {user.email}
+                                Welcome, {user.email}
+                                <br />
+                                <button 
+                                    onClick={handleLogout}
+                                    className={styles.logoutButton}
+                                >
+                                    Logout
+                                </button>
                             </li>
                         )}
                     </>
