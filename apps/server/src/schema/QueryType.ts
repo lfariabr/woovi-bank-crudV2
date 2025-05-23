@@ -5,7 +5,7 @@ import { accountConnectionField } from '../modules/account/accountFields';
 import { transactionConnectionField } from '../modules/transaction/transactionFields';
 import { AccountType } from '../modules/account/accountType';
 import { AccountLoader } from '../modules/account/accountLoader';
-
+import { allAccountsField } from '../modules/account/accountFields';
 
 export const QueryType = new GraphQLObjectType({
 	name: 'Query',
@@ -13,6 +13,8 @@ export const QueryType = new GraphQLObjectType({
 		...messageConnectionField('messages'),
 		...accountConnectionField('accounts'),
 		...transactionConnectionField('transactions'),
+
+		allAccounts: allAccountsField,
 
 		myAccount : {
 			type: AccountType,

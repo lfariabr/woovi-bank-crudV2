@@ -20,7 +20,7 @@ type Query {
     account_id_receiver: String
     amount: Float
   ): TransactionConnection
-
+  allAccounts(first: Int, after: String): AccountConnection
   myAccount: Account
   me: Account
 }
