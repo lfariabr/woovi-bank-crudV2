@@ -54,12 +54,14 @@ async function networkFetch(
 	variables: Variables,
 	headers?: HeadersInit
 ) {
+	const token = localStorage.getItem('token');
 	// Fetch data from GraphQL API:
 	const response = await fetch(GRAPHQL_ENDPOINT, {
 		method: 'POST',
 		headers: {
 			...headers,
 			'Content-Type': 'application/json',
+			...(token ? { Authorization: `Bearer ${token}` } : {}),
 		},
 		body: JSON.stringify({
 			query: params.text,

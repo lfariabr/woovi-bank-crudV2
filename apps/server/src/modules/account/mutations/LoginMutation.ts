@@ -13,7 +13,7 @@ export const LoginMutation = {
             throw new Error('Invalid credentials');
         }
 
-        const token = authService.generateToken(account._id.toString());
+        const token = authService.generateToken(account.accountId); // previously _id, not secure, so changed to accountId
         return {
             account: account.toObject(),
             token,

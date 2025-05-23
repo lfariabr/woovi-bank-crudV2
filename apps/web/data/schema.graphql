@@ -1,48 +1,16 @@
-
-type AuthPayload {
-  token: String!
-  account: Account!
-}
-
-input LoginInput {
-  email: String!
-  password: String!
-}
-
-input RegisterInput {
-  email: String!
-  password: String!
-  first_name: String
-  last_name: String
-  taxId: String!
-  accountId: String!
-}
-
-type Mutation {
-  login(input: LoginInput!): AuthPayload
-  register(input: RegisterInput!): AuthPayload
-  AccountAdd(input: AccountAddInput!): AccountAddPayload
-  AccountUpdate(input: AccountUpdateInput!): AccountUpdatePayload
-  MessageAdd(input: MessageAddInput!): MessageAddPayload
-}
-
 type Query {
-  me: Account
-}
-
-type Query {
-  accounts(
-    after: String
-    first: Int
-    before: String
-    last: Int
-  ): AccountConnection
   messages(
     after: String
     first: Int
     before: String
     last: Int
   ): MessageConnection
+  accounts(
+    after: String
+    first: Int
+    before: String
+    last: Int
+  ): AccountConnection
   transactions(
     after: String
     first: Int
@@ -52,63 +20,9 @@ type Query {
     account_id_receiver: String
     amount: Float
   ): TransactionConnection
-}
 
-type Account implements Node {
-  id: ID!
-  first_name: String
-  last_name: String
-  email: String
-  taxId: String
-  accountId: String
-  createdAt: String
-  isActive: Boolean
-  balance: Float
-}
-
-type AccountConnection {
-  pageInfo: PageInfo!
-  edges: [AccountEdge]
-}
-
-type AccountEdge {
-  node: Account
-  cursor: String!
-}
-
-type AccountAddPayload {
-  account: Account
-  clientMutationId: String
-}
-
-input AccountUpdateInput {
-  id: ID!
-  first_name: String
-  last_name: String
-  email: String
-  taxId: String
-  accountId: String
-  isActive: Boolean
-  balance: Float
-  clientMutationId: String
-}
-
-input AccountAddInput {
-  first_name: String!
-  last_name: String!
-  email: String!
-  taxId: String!
-  accountId: String!
-  clientMutationId: String
-}
-
-type AccountAddedPayload {
-  account: Account
-  clientSubscriptionId: String
-}
-
-input AccountAddedInput {
-  clientSubscriptionId: String
+  myAccount: Account
+  me: Account
 }
 
 type MessageConnection {
@@ -138,61 +52,27 @@ interface Node {
   id: ID!
 }
 
-type AccountUpdatePayload {
-  account: Account
-  clientMutationId: String
+type AccountConnection {
+  pageInfo: PageInfo!
+  edges: [AccountEdge]
 }
 
-type MessageAddPayload {
-  message: Message
-  clientMutationId: String
+type AccountEdge {
+  node: Account
+  cursor: String!
 }
 
-input MessageAddInput {
-  content: String!
-  clientMutationId: String
-}
-
-type Subscription {
-  AccountAdded(input: AccountAddedInput!): AccountAddedPayload
-  AccountUpdated(input: AccountUpdatedInput!): AccountUpdatedPayload
-  MessageAdded(input: MessageAddedInput!): MessageAddedPayload
-  TransactionAdded(input: TransactionAddedInput!): TransactionAddedPayload
-}
-
-input AccountUpdatedInput {
-  clientSubscriptionId: String
-}
-
-type AccountAddedPayload {
-  account: Account
-  clientSubscriptionId: String
-}
-
-type AccountUpdatedPayload {
-  account: Account
-  clientSubscriptionId: String
-}
-
-type MessageAddedPayload {
-  message: Message
-  clientSubscriptionId: String
-}
-
-input MessageAddedInput {
-  clientSubscriptionId: String
-}
-
-###############
-# Transaction #
-###############
-
-type Transaction implements Node {
+type Account implements Node {
   id: ID!
-  amount: Float!
-  account_id_sender: String!
-  account_id_receiver: String!
-  createdAt: String!
+  first_name: String
+  last_name: String
+  email: String
+  taxId: String
+  accountId: String
+  token: String
+  createdAt: String
+  balance: String
+  isActive: Boolean
 }
 
 type TransactionConnection {
@@ -205,9 +85,91 @@ type TransactionEdge {
   cursor: String!
 }
 
-input SendTransactionInput {
-  accountIdReceiver: String!
-  amount: Float!
+type Transaction implements Node {
+  id: ID!
+  account_id_sender: String
+  account_id_receiver: String
+  amount: Int!
+  createdAt: String
+}
+
+type Mutation {
+  MessageAdd(input: MessageAddInput!): MessageAddPayload
+  AccountAdd(input: AccountAddInput!): AccountAddPayload
+  AccountUpdate(input: AccountUpdateInput!): AccountUpdatePayload
+  register(input: RegisterInput!): AuthPayload
+  login(input: LoginInput!): AuthPayload
+  logout(input: LogoutInput!): LogoutPayload
+  SendTransaction(input: SendTransactionInput!): SendTransactionPayload
+  ReceiveTransaction(input: ReceiveTransactionInput!): ReceiveTransactionPayload
+}
+
+type MessageAddPayload {
+  message: Message
+  clientMutationId: String
+}
+
+input MessageAddInput {
+  content: String!
+  clientMutationId: String
+}
+
+type AccountAddPayload {
+  account: Account
+  clientMutationId: String
+}
+
+input AccountAddInput {
+  first_name: String!
+  last_name: String!
+  email: String!
+  taxId: String!
+  accountId: String!
+  balance: String!
+  clientMutationId: String
+}
+
+type AccountUpdatePayload {
+  account: Account
+  clientMutationId: String
+}
+
+input AccountUpdateInput {
+  first_name: String
+  last_name: String
+  email: String
+  taxId: String
+  accountId: String
+  balance: String
+  clientMutationId: String
+}
+
+type AuthPayload {
+  token: String!
+  account: Account!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  first_name: String
+  last_name: String
+  taxId: String
+  accountId: String
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type LogoutPayload {
+  success: String
+  clientMutationId: String
+}
+
+input LogoutInput {
+  token: String!
   clientMutationId: String
 }
 
@@ -216,15 +178,64 @@ type SendTransactionPayload {
   clientMutationId: String
 }
 
-extend type Mutation {
-  sendTransaction(input: SendTransactionInput!): SendTransactionPayload
+input SendTransactionInput {
+  account_id_sender: String!
+  account_id_receiver: String!
+  amount: Int!
+  clientMutationId: String
 }
 
-input TransactionAddedInput {
+type ReceiveTransactionPayload {
+  transaction: Transaction
+  clientMutationId: String
+}
+
+input ReceiveTransactionInput {
+  account_id_receiver: String!
+  account_id_sender: String
+  amount: Int
+  clientMutationId: String
+}
+
+type Subscription {
+  MessageAdded(input: MessageAddedInput!): MessageAddedPayload
+  AccountAdded(input: AccountAddedInput!): AccountAddedPayload
+  AccountUpdated(input: AccountUpdatedInput!): AccountUpdatedPayload
+  SendTransaction(input: SendTransactionSubscriptionInput!): SendTransactionSubscriptionPayload
+}
+
+type MessageAddedPayload {
+  message: Message
   clientSubscriptionId: String
 }
 
-type TransactionAddedPayload {
+input MessageAddedInput {
+  clientSubscriptionId: String
+}
+
+type AccountAddedPayload {
+  account: Account
+  clientSubscriptionId: String
+}
+
+input AccountAddedInput {
+  clientSubscriptionId: String
+}
+
+type AccountUpdatedPayload {
+  account: Account
+  clientSubscriptionId: String
+}
+
+input AccountUpdatedInput {
+  clientSubscriptionId: String
+}
+
+type SendTransactionSubscriptionPayload {
   transaction: Transaction
+  clientSubscriptionId: String
+}
+
+input SendTransactionSubscriptionInput {
   clientSubscriptionId: String
 }

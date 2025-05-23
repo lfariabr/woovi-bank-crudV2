@@ -13,11 +13,22 @@ export const QueryType = new GraphQLObjectType({
 		...messageConnectionField('messages'),
 		...accountConnectionField('accounts'),
 		...transactionConnectionField('transactions'),
+
+		myAccount : {
+			type: AccountType,
+			description: 'Get the currently auth user',
+			resolve: async (_, __, context) => {
+				if (!context.accountId) {
+					throw new Error('Not authenticated');
+				}
+				return await AccountLoader.load(context, context.accountId);
+			}
+		},
+
 		me: {
 			type: AccountType,
 			description: 'Get the currently auth user',
 			resolve: async (_, __, context) => {
-				console.log('context', context);
 				if (!context.accountId) {
 					throw new Error('Not authenticated');
 				}

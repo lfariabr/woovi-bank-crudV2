@@ -89,9 +89,7 @@ export const TransactionsList = ({
           <Transaction
             key={edge.node.id}
             transaction={edge.node}
-            account_id_sender={account_id_sender}
-            account_id_receiver={account_id_receiver}
-            amount={amount}
+            currentUserAccountId={currentUserAccountId}
           />
         ) : null
 )}
