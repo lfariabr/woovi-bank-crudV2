@@ -86,32 +86,30 @@ export const AccountList = ({
   }
 
   if (showOnlyUserAccount) {
+    // Get the current user from auth store
+    const { user } = require('../../lib/auth-store').authStore.getState();
     
-    // Get the current user's information from localStorage
-    let userData: { accountId?: string } | null = null;
-    try {
-      if (typeof window !== 'undefined') {
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-          userData = JSON.parse(userStr);
-        }
-      }
-    } catch (e) {
-      // Error handling silently
-    }
-    
-    // Find the account that matches the logged-in user's accountId
+    // Find the account that matches the logged-in user's ID or accountId
     let accountEdge: any = null;
     
-    if (userData && userData.accountId) {
-      // Try to find an account with matching accountId
-      accountEdge = data.accounts.edges.find(edge => 
-        edge?.node?.accountId === userData?.accountId
-      );
+    if (user) {
+      // First try matching by MongoDB ObjectId
+      if (user.id) {
+        accountEdge = data.accounts.edges.find(edge => 
+          edge?.node?.id === user.id
+        );
+      }
+      
+      // If no match found, try matching by accountId
+      if (!accountEdge && user.accountId) {
+        accountEdge = data.accounts.edges.find(edge => 
+          edge?.node?.accountId === user.accountId
+        );
+      }
     }
     
-    // If no match found, use the first account as fallback
-    if (!accountEdge) {
+    // If still no match found, use the first account as fallback
+    if (!accountEdge && data.accounts.edges.length > 0) {
       accountEdge = data.accounts.edges[0];
     }
     
@@ -128,14 +126,6 @@ export const AccountList = ({
     
     return (
       <div className="flex flex-col gap-4">
-        <div className="mb-4">
-          <h3 className="text-lg font-medium text-primary">
-            Your Account (ID: {currentUserAccountId})
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            Account details for {accountEdge.node.first_name} {accountEdge.node.last_name}
-          </p>
-        </div>
         <Account
           key={accountEdge.node.id}
           account={accountEdge.node}

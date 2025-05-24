@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+// Temporarily disabled font loading to fix build error
+// import { Inter } from 'next/font/google';
 import './globals.css';
 import { Layout } from '../components/Layout';
 import { RelayProvider } from '../providers/RelayProvider';
 
-const inter = Inter({ subsets: ['latin'] });
+// const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Woovi',
@@ -18,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <RelayProvider>
           <Layout>
             {children}

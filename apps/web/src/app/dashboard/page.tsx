@@ -1,8 +1,7 @@
 'use client';
 import React, { useState, Suspense, useEffect } from 'react';
-import { Box, Typography, Paper, Container, Grid, Divider, CircularProgress } from '@mui/material';
 import { usePreloadedQuery, useQueryLoader } from 'react-relay';
-import { graphql } from 'react-relay';
+import { Loader2 } from 'lucide-react';
 
 import { authStore } from '../../lib/auth-store';
 import { AccountList } from '../../components/Account/AccountList';
@@ -21,30 +20,58 @@ function AccountContent({
   const data = usePreloadedQuery<AccountQueryType>(ACCOUNT_QUERY, queryRef);  
   if (!data) {
     return (
-      <Typography variant="body1" align="center">
+      <p style={{ textAlign: 'center', color: '#666', fontSize: '1rem' }}>
         Error: No data loaded.
-      </Typography>
+      </p>
     );
   }
     
+  // Get user account information from auth store for direct display
+  const { user } = authStore.getState();
+  
   return (
-    <Box>
+    <div>
+      {/* Direct user card display similar to transaction page */}
+      {user && (
+        <div className="mb-6">
+          <h3 className="text-lg font-medium text-primary mb-2">
+            Your Account (ID: {user.accountId || user.taxId || currentUserAccountId})
+          </h3>
+          
+          <div className="border-2 hover:border-[#03d69d] rounded-xl shadow transition-all duration-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-[#03d69d] to-[#02b987] p-3">
+              <h3 className="text-white font-semibold px-1">
+                {`${user.first_name || ''} ${user.last_name || ''}`}
+              </h3>
+            </div>
+            <div className="p-4">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 font-medium">Balance:</span>
+                <span className="bg-[#edfdf9] text-[#03d69d] font-bold px-4 py-1.5 rounded-full">
+                  ${parseFloat(user.balance || '1000.00').toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <AccountList 
         query={data} 
         currentUserAccountId={currentUserAccountId} 
         showOnlyUserAccount={true}
       />
-      <Divider sx={{ mb: 3 }} />
-      <Typography variant="h6" gutterBottom>
+      <hr style={{ margin: '1.5rem 0', border: 'none', height: '1px', backgroundColor: '#e5e7eb' }} />
+      <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem', color: '#03d69d' }}>
         Transaction History
-      </Typography>
+      </h2>
       
       <TransactionsList 
         query={data} 
         currentUserAccountId={currentUserAccountId}
         amount={0}
       />
-    </Box>
+    </div>
   );
 }
 
@@ -86,39 +113,39 @@ const DashboardPage: React.FC<DashboardPageProps> = () => {
     
     if (!isClient) {
         return (
-            <Container maxWidth="md" sx={{ py: 4 }}>
-                <Box sx={{ height: '100vh' }} />
-            </Container>
+            <div style={{ maxWidth: '768px', margin: '0 auto', padding: '1.5rem 1rem' }}>
+                <div style={{ height: '100vh' }} />
+            </div>
         );
     }
     
     if (!user || !token) {
         return (
-            <Container maxWidth="md" sx={{ py: 4 }}>
-                <Paper elevation={3} sx={{ p: 4 }}>
-                    <Typography variant="h5" align="center">
+            <div style={{ maxWidth: '768px', margin: '0 auto', padding: '1.5rem 1rem' }}>
+                <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600, textAlign: 'center', color: '#333' }}>
                         Please log in to view your account
-                    </Typography>
-                </Paper>
-            </Container>
+                    </h3>
+                </div>
+            </div>
         );
     }
     
     const userAccountId = user.id || "";
     
     return (
-        <Container maxWidth="md" sx={{ py: 4 }}>
-            <Paper elevation={3} sx={{ p: 4 }}>
-                <Typography variant="h5" align="center" gutterBottom>
+        <div style={{ maxWidth: '768px', margin: '0 auto', padding: '1.5rem 1rem' }}>
+            <div style={{ padding: '1.5rem', backgroundColor: 'white', borderRadius: '0.75rem', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)' }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 600, textAlign: 'center', marginBottom: '0.75rem', color: '#03d69d' }}>
                     Account Dashboard
-                </Typography>
-                <Divider sx={{ mb: 3 }} />
+                </h1>
+                <hr style={{ margin: '0 0 1.5rem 0', border: 'none', height: '1px', backgroundColor: '#e5e7eb' }} />
                 
                 {queryRef ? (
                   <Suspense fallback={
-                    <Box sx={{ py: 4, textAlign: 'center' }}>
-                      <CircularProgress />
-                    </Box>
+                    <div style={{ padding: '1.5rem 0', textAlign: 'center' }}>
+                      <Loader2 className="animate-spin" style={{ height: '24px', width: '24px', color: '#03d69d', margin: '0 auto' }} />
+                    </div>
                   }>
                     <AccountContent 
                       queryRef={queryRef} 
@@ -126,12 +153,12 @@ const DashboardPage: React.FC<DashboardPageProps> = () => {
                     />
                   </Suspense>
                 ) : (
-                  <Box sx={{ py: 4, textAlign: 'center' }}>
-                    <CircularProgress />
-                  </Box>
+                  <div style={{ padding: '1.5rem 0', textAlign: 'center' }}>
+                    <Loader2 className="animate-spin" style={{ height: '24px', width: '24px', color: '#03d69d', margin: '0 auto' }} />
+                  </div>
                 )}
-            </Paper>
-        </Container>
+            </div>
+        </div>
     );
 };
         

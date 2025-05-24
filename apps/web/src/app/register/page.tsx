@@ -1,13 +1,19 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, TextField, Button, Typography, Container, Paper } from '@mui/material';
 import { useMutation } from 'react-relay';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { REGISTER_MUTATION } from './RegisterMutation';
 import type { RegisterMutation } from '../../__generated__/RegisterMutation.graphql';
+
+// Import shadcn UI components
+import { Card, CardHeader, CardContent, CardFooter } from '../../components/ui/card';
+import { Label } from '../../components/ui/label';
+import { Input } from '../../components/ui/input';
+import { Button } from '../../components/ui/button';
+import { Alert, AlertDescription } from '../../components/ui/alert';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -88,104 +94,129 @@ const Register: React.FC = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Paper elevation={3} sx={{ p: 4, width: '100%', borderRadius: 2 }}>
-          <Typography component="h1" variant="h4" align="center" color="primary" gutterBottom>
-            Create Account
-          </Typography>
-          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 4 }}>
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-1">
+          <h1 className="text-2xl font-bold text-center text-[#03d69d]">Create Account</h1>
+          <p className="text-sm text-center text-gray-500">
             Register for a new Woovi account
-          </Typography>
+          </p>
+        </CardHeader>
+        
+        <CardContent>
           {error && (
-            <Typography color="error" align="center" sx={{ mb: 2 }}>
-              {error}
-            </Typography>
+            <Alert className="mb-4 bg-red-50 text-red-600 border-red-200">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              autoComplete="email"
-              autoFocus
-              error={!!errors.email}
-              helperText={errors.email?.message}
-              disabled={isSubmitting}
-              {...register('email')}
-              variant="outlined"
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="new-password"
-              error={!!errors.password}
-              helperText={errors.password?.message}
-              disabled={isSubmitting}
-              {...register('password')}
-            />
-            <TextField
-              margin="normal"
-              fullWidth
-              label="First Name"
-              id="first_name"
-              error={!!errors.first_name}
-              helperText={errors.first_name?.message}
-              disabled={isSubmitting}
-              {...register('first_name')}
-            />
-            <TextField
-              margin="normal"
-              fullWidth
-              label="Last Name"
-              id="last_name"
-              error={!!errors.last_name}
-              helperText={errors.last_name?.message}
-              disabled={isSubmitting}
-              {...register('last_name')}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Tax ID"
-              id="taxId"
-              error={!!errors.taxId}
-              helperText={errors.taxId?.message}
-              disabled={isSubmitting}
-              {...register('taxId')}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              label="Account ID"
-              id="accountId"
-              error={!!errors.accountId}
-              helperText={errors.accountId?.message}
-              disabled={isSubmitting}
-              {...register('accountId')}
-            />
+          
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                autoFocus
+                disabled={isSubmitting}
+                className={errors.email ? "border-red-300" : ""}
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                className={errors.password ? "border-red-300" : ""}
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-500">{errors.password.message}</p>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="first_name">First Name</Label>
+                <Input
+                  id="first_name"
+                  disabled={isSubmitting}
+                  className={errors.first_name ? "border-red-300" : ""}
+                  {...register('first_name')}
+                />
+                {errors.first_name && (
+                  <p className="text-sm text-red-500">{errors.first_name.message}</p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="last_name">Last Name</Label>
+                <Input
+                  id="last_name"
+                  disabled={isSubmitting}
+                  className={errors.last_name ? "border-red-300" : ""}
+                  {...register('last_name')}
+                />
+                {errors.last_name && (
+                  <p className="text-sm text-red-500">{errors.last_name.message}</p>
+                )}
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="taxId">Tax ID (CPF)</Label>
+              <Input
+                id="taxId"
+                disabled={isSubmitting}
+                className={errors.taxId ? "border-red-300" : ""}
+                {...register('taxId')}
+              />
+              {errors.taxId && (
+                <p className="text-sm text-red-500">{errors.taxId.message}</p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="accountId">Account ID</Label>
+              <Input
+                id="accountId"
+                disabled={isSubmitting}
+                className={errors.accountId ? "border-red-300" : ""}
+                {...register('accountId')}
+              />
+              {errors.accountId && (
+                <p className="text-sm text-red-500">{errors.accountId.message}</p>
+              )}
+            </div>
+            
             <Button
               type="submit"
-              fullWidth
-              variant="contained"
+              variant="default"
               disabled={isSubmitting}
-              sx={{ mt: 3, mb: 2, py: 1.5, borderRadius: 1, textTransform: 'none', fontSize: '1rem', fontWeight: 500 }}
+              className="w-full bg-[#03d69d] hover:bg-[#02b987] text-white"
             >
               {isSubmitting ? 'Registering...' : 'Register'}
             </Button>
-          </Box>
-        </Paper>
-      </Box>
-    </Container>
+          </form>
+        </CardContent>
+        
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-gray-500">
+            Already have an account?{' '}
+            <a href="/login" className="text-[#03d69d] hover:underline">
+              Sign in
+            </a>
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

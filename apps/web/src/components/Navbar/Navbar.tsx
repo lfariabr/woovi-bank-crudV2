@@ -20,6 +20,7 @@ const Navbar: React.FC = () => {
         authStore.setState({ token: null, user: null });
         if (typeof window !== 'undefined') {
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
         }
         router.push('/login');
         router.refresh(); // Ensure the page updates after logout
@@ -97,9 +98,9 @@ const Navbar: React.FC = () => {
                         </li>
 
                         {user?.email && (
-                            <li style={{ marginLeft: '20px', paddingLeft: '20px', borderLeft: '1px solid #e5e7eb' }}>
+                            <li style={{ marginLeft: '20px', paddingLeft: '20px', borderLeft: '1px solid #e5e7eb' , marginRight: '20px'}}>
                                 <div>
-                                    <span style={{ fontSize: '0.875rem', color: '#4b5563' }}>Welcome, {user.email}</span>
+                                    <span style={{ fontSize: '0.875rem', color: '#4b5563' }}>Hi, {user.first_name}</span>
                                     <br />
                                     <button 
                                         onClick={handleLogout}

@@ -65,43 +65,68 @@ export const TransactionsList = ({
   
   if (!data?.transactions?.edges) {
     return (
-      <div className="py-8 text-center">
-        <p className="text-gray-500">
-          No transaction data available.
-        </p>
+      <div className="py-8 text-center bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
+        <div className="p-6">
+          <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 8v4"></path>
+              <path d="M12 16h.01"></path>
+            </svg>
+          </div>
+          <p className="text-gray-500 font-medium">
+            No transaction data available.
+          </p>
+        </div>
       </div>
     );
   }
 
   if (data.transactions.edges.length === 0) {
     return (
-      <div className="py-8 text-center">
-        <p className="text-gray-500">
-          No transactions found.
-        </p>
+      <div className="py-8 text-center bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
+        <div className="p-6">
+          <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 8v4"></path>
+              <path d="M12 16h.01"></path>
+            </svg>
+          </div>
+          <p className="text-gray-500 font-medium">
+            No transactions found.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col space-y-4">
-      {data.transactions.edges.map((edge) =>
-        edge && edge.node ? (
-          <Transaction
-            key={edge.node.id}
-            transaction={edge.node}
-            currentUserAccountId={currentUserAccountId}
-          />
-        ) : null
-      )}
+      <div className="relative">
+        {data.transactions.edges.length > 0 && (
+          <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#03d69d] to-transparent z-0"></div>
+        )}
+        <div className="relative z-10">
+          {data.transactions.edges.map((edge, index) =>
+            edge && edge.node ? (
+              <div key={edge.node.id} className="mb-4">
+                <Transaction
+                  transaction={edge.node}
+                  currentUserAccountId={currentUserAccountId}
+                />
+              </div>
+            ) : null
+          )}
+        </div>
+      </div>
       
       {hasNext && (
-        <div className="text-center mt-4">
+        <div className="text-center mt-8">
           <Button 
-            variant="outline" 
             onClick={loadMore} 
             disabled={isLoadingNext}
-            className="min-w-[120px]"
+            className="min-w-[150px] bg-gradient-to-r from-[#03d69d] to-[#02b987] text-white font-medium hover:shadow-lg transition-all duration-200 rounded-full px-6 py-2"
           >
             {isLoadingNext ? (
               <>
@@ -109,7 +134,7 @@ export const TransactionsList = ({
                 Loading...
               </>
             ) : (
-              'Load More'
+              'Load More Transactions'
             )}
           </Button>
         </div>

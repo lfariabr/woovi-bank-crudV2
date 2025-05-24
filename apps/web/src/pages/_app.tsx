@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react';
 import type { AppProps } from 'next/app';
-import '../globals.css';
 
 import { ReactRelayContainer } from '../relay/ReactRelayContainer';
 

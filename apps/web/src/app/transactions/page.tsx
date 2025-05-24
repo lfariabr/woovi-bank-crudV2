@@ -1,8 +1,13 @@
 'use client';
 import React, { useState, Suspense, useEffect } from 'react';
-import { Box, Typography, Paper, Container, Grid, Divider, CircularProgress, Tab, Tabs, Button } from '@mui/material';
 import { usePreloadedQuery, useQueryLoader } from 'react-relay';
 import { graphql } from 'react-relay';
+import { Loader2 } from 'lucide-react';
+
+// Shadcn UI Components
+import { Button } from '../../components/ui/button';
+import { Card, CardContent, CardHeader } from '../../components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 
 import { authStore } from '../../lib/auth-store';
 import { TransactionsList } from '../../components/Transaction/TransactionsList';
@@ -11,7 +16,7 @@ import type { TransactionsQuery as TransactionsQueryType } from '../../__generat
 import type { AccountsQuery as AccountsQueryType } from '../../__generated__/AccountsQuery.graphql';
 import { TRANSACTIONS_QUERY } from './TransactionsQuery';
 import { ACCOUNTS_QUERY } from './AccountsQuery';
-
+// Refactoring to use Shadcn UI components instead of inline styles
 type TransactionsPageProps = {
   currentUserAccountId: string;
   account_id_sender?: string;
@@ -32,7 +37,7 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({
   const [isClient, setIsClient] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent | null, newValue: number) => {
     setActiveTab(newValue);
     
     // When switching to send money tab, we ensure accounts are loaded
@@ -109,105 +114,126 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({
     }
   }, [token, user, cursor, amount]);
 
+  // Helper component for loading state
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center py-8">
+      <Loader2 className="h-8 w-8 animate-spin text-[#03d69d]" />
+    </div>
+  );
+
   if (!isClient) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Box sx={{ height: '100vh' }} />
-      </Container>
+      <div className="container max-w-3xl mx-auto p-6">
+        <div className="min-h-[50vh] flex items-center justify-center">
+          <LoadingSpinner />
+        </div>
+      </div>
     );
   }
 
   if (!user || !token) {
     return (
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h5" align="center">
-            Please log in to view transactions
-          </Typography>
-        </Paper>
-      </Container>
+      <div className="container max-w-3xl mx-auto p-6">
+        <Card className="w-full shadow-md">
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold text-center">
+              Please log in to view your account
+            </h3>
+            <div className="flex justify-center mt-4">
+              <Button 
+                onClick={() => window.location.href = '/'}
+                className="bg-gradient-to-r from-[#03d69d] to-[#02b987] text-white"
+              >
+                Go to Login
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
+    <div className="container max-w-3xl mx-auto p-6">
+      <h1 className="text-3xl font-semibold mb-6 text-[#03d69d] text-center">
         Transactions
-      </Typography>
+      </h1>
       
-      <Paper sx={{ mb: 4 }}>
-        <Tabs value={activeTab} onChange={handleTabChange} aria-label="transaction tabs" variant="fullWidth">
-          <Tab label="Transaction History" />
-          <Tab label="Send Money" />
-        </Tabs>
-      </Paper>
-
-      <Grid container spacing={4}>
-        <Grid item xs={12}>
-          <Paper sx={{ p: 3 }}>
-            {activeTab === 0 ? (
-              <>
-                <Typography variant="h6" gutterBottom>
-                  Transaction History
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-
-                {transactionsQueryRef ? (
-                  <Suspense fallback={
-                    <Box sx={{ py: 4, textAlign: 'center' }}>
-                      <CircularProgress />
-                    </Box>
-                  }>
-                    <TransactionContent queryRef={transactionsQueryRef} currentUserAccountId={user.id} />
-                  </Suspense>
-                ) : (
-                  <Box sx={{ py: 4, textAlign: 'center' }}>
-                    <CircularProgress />
-                  </Box>
-                )}
-              </>
-            ) : (
-              <>
-                <Typography variant="h6" gutterBottom>
-                  Send Money
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                
-                {!accountsQueryRef ? (
-                  <Box sx={{ py: 4, textAlign: 'center' }}>
-                    <Button 
-                      variant="contained" 
-                      onClick={loadAccountsData}
-                      startIcon={<CircularProgress size={20} />}
-                    >
-                      Load Accounts
-                    </Button>
-                  </Box>
-                ) : (
-                  <Suspense fallback={
-                    <Box sx={{ py: 4, textAlign: 'center' }}>
-                      <CircularProgress />
-                    </Box>
-                  }>
-                    <SendTransactionContent 
-                      queryRef={accountsQueryRef} 
-                      currentUserAccountId={user.id}
-                      preSelectedSenderId={typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('senderId') : null}
-                      onComplete={() => {
-                        // Reload data after transaction
-                        loadTransactionData();
-                        // Reset tab to transaction history
-                        setActiveTab(0);
-                      }}
-                    />
-                  </Suspense>
-                )}
-              </>
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+      <Tabs 
+        value={activeTab.toString()} 
+        onValueChange={(value) => handleTabChange(null, parseInt(value))} 
+        className="w-full"
+      >
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger 
+            value="0" 
+            className="data-[state=active]:bg-white data-[state=active]:text-[#03d69d] data-[state=active]:font-semibold"
+          >
+            Transaction History
+          </TabsTrigger>
+          <TabsTrigger 
+            value="1" 
+            className="data-[state=active]:bg-white data-[state=active]:text-[#03d69d] data-[state=active]:font-semibold"
+          >
+            Send Money
+          </TabsTrigger>
+        </TabsList>
+        
+        {/* Transaction History Tab */}
+        <TabsContent value="0" className="mt-0">
+          <Card>
+            <CardHeader className="pb-3">
+              <h2 className="text-xl font-semibold text-[#03d69d]">Transaction History</h2>
+            </CardHeader>
+            <CardContent>
+              {transactionsQueryRef ? (
+                <Suspense fallback={<LoadingSpinner />}>
+                  <TransactionContent queryRef={transactionsQueryRef} currentUserAccountId={user.id} />
+                </Suspense>
+              ) : (
+                <LoadingSpinner />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* Send Money Tab */}
+        <TabsContent value="1" className="mt-0">
+          <Card>
+            <CardHeader className="pb-3">
+              <h2 className="text-xl font-semibold text-[#03d69d]">Send Money</h2>
+            </CardHeader>
+            <CardContent>
+              {!accountsQueryRef ? (
+                <div className="flex justify-center py-4">
+                  <Button 
+                    onClick={loadAccountsData}
+                    className="bg-gradient-to-r from-[#03d69d] to-[#02b987] text-white font-medium hover:shadow-lg transition-all duration-200 rounded-full px-6 py-2 flex items-center"
+                  >
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Load Accounts
+                  </Button>
+                </div>
+              ) : (
+                <Suspense fallback={<LoadingSpinner />}>
+                  <SendTransactionContent 
+                    queryRef={accountsQueryRef} 
+                    currentUserAccountId={user.id}
+                    preSelectedSenderId={typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('senderId') : null}
+                    onComplete={() => {
+                      // Reload data after transaction
+                      loadTransactionData();
+                      // Reset tab to transaction history
+                      setActiveTab(0);
+                    }}
+                  />
+                </Suspense>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
@@ -223,17 +249,23 @@ function TransactionContent({
 
   if (!data) {
     console.error("usePreloadedQuery returned null or undefined data in TransactionContent");
-    return <Typography>Error: No data loaded.</Typography>;
+    return (
+      <div className="text-center text-gray-600 py-4">
+        <p>Error: No transaction data available</p>
+      </div>
+    );
   }
 
   return (
-    <TransactionsList 
-      query={data} 
-      currentUserAccountId={currentUserAccountId} 
-      account_id_sender={currentUserAccountId}
-      account_id_receiver=""
-      amount={0}
-    />
+    <div className="w-full">
+      <TransactionsList 
+        query={data} 
+        currentUserAccountId={currentUserAccountId} 
+        account_id_sender={currentUserAccountId}
+        account_id_receiver=""
+        amount={0}
+      />
+    </div>
   );
 }
 
@@ -253,16 +285,30 @@ function SendTransactionContent({
 
   if (!data) {
     console.error("usePreloadedQuery returned null or undefined data in SendTransactionContent");
-    return <Typography>Error: No data loaded.</Typography>;
+    return (
+      <div className="text-center text-gray-600 py-4">Error: No data loaded.</div>
+    );
   }
   
-  // Extract accounts from data
-  const accounts = data.accounts?.edges || [];
+  // Extract accounts from data and convert to the expected format
+  const accountEdges = data.accounts?.edges || [];
+  // Convert readonly array to mutable array with the expected Account type
+  const accounts = accountEdges.map(edge => ({
+    node: {
+      id: edge?.node?.id || '',
+      first_name: edge?.node?.first_name || '',
+      last_name: edge?.node?.last_name || '',
+      balance: {
+        toString: () => edge?.node?.balance?.toString() || '0'
+      }
+    }
+  }));
   
   return (
     <SendTransactionForm 
       accounts={accounts}
       currentUserAccountId={currentUserAccountId}
+      preSelectedSenderId={preSelectedSenderId}
       onTransactionComplete={onComplete}
     />
   );

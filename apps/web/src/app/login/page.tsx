@@ -2,8 +2,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Box, TextField, Button, Typography, Container, Paper, InputAdornment, IconButton } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useMutation } from 'react-relay';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -11,6 +9,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LOGIN_MUTATION } from './LoginMutation';
 import type { LoginMutation } from '../../__generated__/LoginMutation.graphql';
 import { authStore } from '../../lib/auth-store';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+
+// Shadcn UI Components
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Card, CardContent, CardHeader } from '../../components/ui/card';
+import { Alert, AlertDescription } from '../../components/ui/alert';
+import { Label } from '../../components/ui/label';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -68,115 +74,101 @@ const Login: React.FC = () => {
         });
     };
     return (
-        <Container component="main" maxWidth="xs">
-            <Box
-                sx={{
-                    marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
-            >
-                <Paper 
-                    elevation={3} 
-                    sx={{ 
-                        p: 4, 
-                        width: '100%',
-                        borderRadius: 2,
-                        backgroundColor: 'background.paper',
-                    }}
-                >
-                    <Typography component="h1" variant="h4" align="center" color="primary" gutterBottom>
-                        Welcome Back
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 4 }}>
+        <div className="flex justify-center items-center min-h-screen p-4">
+            <Card className="w-full max-w-md shadow-lg border-0 rounded-xl overflow-hidden">
+                <div className="h-2 w-full bg-gradient-to-r from-[#03d69d] to-[#02b987]"></div>
+                
+                <CardHeader className="pt-6 pb-2">
+                    <h1 className="text-2xl font-bold text-center text-[#03d69d]">Welcome Back</h1>
+                    <p className="text-sm text-center text-gray-500 mt-1">
                         Sign in to your Woovi account
-                    </Typography>
-                    
+                    </p>
+                </CardHeader>
+                
+                <CardContent className="px-6 pb-6 space-y-4">
                     {error && (
-                        <Typography color="error" align="center" sx={{ mb: 2 }}>
-                            {error}
-                        </Typography>
+                        <Alert variant="destructive" className="mb-4">
+                            <AlertDescription>{error}</AlertDescription>
+                        </Alert>
                     )}
                     
-                    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
-                            autoComplete="email"
-                            autoFocus
-                            error={!!errors.email}
-                            helperText={errors.email?.message}
-                            disabled={isSubmitting}
-                            {...register('email')}
-                            variant="outlined"
-                            sx={{ mb: 2 }}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            label="Password"
-                            type={showPassword ? 'text' : 'password'}
-                            id="password"
-                            autoComplete="current-password"
-                            error={!!errors.password}
-                            helperText={errors.password?.message}
-                            disabled={isSubmitting}
-                            {...register('password')}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            edge="end"
-                                        >
-                                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="email" className="text-sm font-medium">
+                                Email Address
+                            </Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="your@email.com"
+                                autoComplete="email"
+                                autoFocus
+                                disabled={isSubmitting}
+                                {...register('email')}
+                                className={errors.email ? 'border-red-500' : ''}
+                            />
+                            {errors.email && (
+                                <p className="text-sm text-red-500">{errors.email.message}</p>
+                            )}
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label htmlFor="password" className="text-sm font-medium">
+                                Password
+                            </Label>
+                            <div className="relative">
+                                <Input
+                                    id="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="••••••••"
+                                    autoComplete="current-password"
+                                    disabled={isSubmitting}
+                                    {...register('password')}
+                                    className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                            {errors.password && (
+                                <p className="text-sm text-red-500">{errors.password.message}</p>
+                            )}
+                        </div>
+                        
                         <Button
                             type="submit"
-                            fullWidth
-                            variant="contained"
-                            disabled={isPending}
-                            sx={{ 
-                                mt: 3, 
-                                mb: 2,
-                                py: 1.5,
-                                borderRadius: 1,
-                                textTransform: 'none',
-                                fontSize: '1rem',
-                                fontWeight: 500,
-                            }}
+                            disabled={isSubmitting || isPending}
+                            className="w-full bg-gradient-to-r from-[#03d69d] to-[#02b987] text-white font-medium hover:shadow-lg transition-all duration-200 py-5 rounded-full mt-4"
                         >
-                            {isSubmitting ? 'Signing in...' : 'Sign In'}
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Signing in...
+                                </>
+                            ) : (
+                                'Sign In'
+                            )}
                         </Button>
-                        <Box sx={{ textAlign: 'center', mt: 2 }}>
-                            <Typography variant="body2" color="text.secondary">
+                        
+                        <div className="text-center">
+                            <p className="text-sm text-gray-600">
                                 Don't have an account?{' '}
                                 <Link 
                                     href="/register" 
-                                    style={{ 
-                                        color: '#03d69d',
-                                        textDecoration: 'none',
-                                        fontWeight: 500,
-                                    }}
+                                    className="text-[#03d69d] font-medium hover:underline"
                                 >
                                     Sign up
                                 </Link>
-                            </Typography>
-                        </Box>
-                    </Box>
-                </Paper>
-            </Box>
-        </Container>
+                            </p>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+        </div>
     );
 };
 

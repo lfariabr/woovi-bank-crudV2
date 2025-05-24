@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                     <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-                        <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#03d69d' }}>Woovi Bank</span>
+                        <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#03d69d' }}>Woovi</span>
                         <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '8px' }}>Simplified banking for everyone</p>
                     </div>
 
