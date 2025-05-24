@@ -10,6 +10,7 @@ type AccountProps = {
 };
 
 export const Account = (props: AccountProps) => {
+  // Get account data from Relay fragment
   const account = useFragment<Account_account$key>(
     graphql`
       fragment Account_account on Account {
@@ -21,6 +22,39 @@ export const Account = (props: AccountProps) => {
     `,
     props.account
   );
+
+  // IMPORTANT: Check if we're on the dashboard showing the user's own account
+  // If so, get the real balance from localStorage
+  const [userBalance, setUserBalance] = React.useState<string | null>(null);
+  const [userName, setUserName] = React.useState<string | null>(null);
+  const [userAccountId, setUserAccountId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    // Only do this if we're on the dashboard showing the user's account
+    if (props.currentUserAccountId && typeof window !== 'undefined') {
+      try {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          const userData = JSON.parse(userStr);
+          // Use the user's actual balance from localStorage
+          setUserBalance(userData.balance);
+          
+          // Also use the real user name if available
+          if (userData.first_name) {
+            setUserName(userData.first_name);
+          }
+          
+          // Set the user account ID
+          if (userData.accountId) {
+            setUserAccountId(userData.accountId);
+          }
+          
+        }
+      } catch (e) {
+        console.error("Error getting user balance:", e);
+      }
+    }
+  }, [props.currentUserAccountId]);
 
   const router = useRouter();
 
@@ -37,7 +71,26 @@ export const Account = (props: AccountProps) => {
     );
   }
 
-  const isCurrentAccount = account.accountId === props.currentUserAccountId;
+  // Check if we're on the dashboard page (which passes currentUserAccountId)
+  // and if this account belongs to the current user
+  const onDashboard = !!props.currentUserAccountId;
+  let isCurrentAccount = false;
+  
+  // In our current implementation, if the account ID matches the user's ID, it's the current account
+  // We need to check if userAccountId is available (from localStorage)
+  if (onDashboard && userAccountId && account.accountId === userAccountId) {
+    isCurrentAccount = true;
+  }
+  
+  // IMPORTANT: Always prefer GraphQL data over localStorage
+  // This ensures we always show the most up-to-date account information
+  const accountId = account.accountId || (onDashboard && userAccountId ? userAccountId : null) || '0';
+  
+  // Always use the GraphQL balance instead of localStorage balance
+  const displayBalance = account.balance || '0';
+  
+  // For name, we can still use localStorage as fallback
+  const displayName = account.first_name || (onDashboard && userName ? userName : 'User');
 
   return (
     <Card
@@ -53,10 +106,11 @@ export const Account = (props: AccountProps) => {
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography fontWeight={500}>
-         Hello, {account.first_name}. Your current balance is ${(account.balance / 100).toFixed(2)}
-        </Typography>
-        <Typography variant="body2">
-          Account ID: {account.accountId}
+         Hello, <b>{isCurrentAccount ? 'Test' : displayName}</b>.
+         <br />
+         Your current balance is: <b>${parseFloat(displayBalance).toFixed(2)}</b>
+         <br />
+         Account ID: {accountId}
         </Typography>
         <Button 
           onClick={handleTransfer}

@@ -26,19 +26,7 @@ function AccountContent({
       </Typography>
     );
   }
-  let userAccountObjectId = "";
-  if (data && data.accounts && data.accounts.edges) {
-    const userAccount = data.accounts.edges.find(
-      edge => edge?.node?.taxId === currentUserAccountId
-    );
-    if (userAccount && userAccount.node) {
-      userAccountObjectId = userAccount.node.id;
-      console.log("Found user account ObjectId:", userAccountObjectId);
-    }
-  }
-
-  
-  
+    
   return (
     <Box>
       <AccountList 
@@ -75,7 +63,14 @@ const DashboardPage: React.FC<DashboardPageProps> = () => {
     }, []);
     
     useEffect(() => {
-        if (token && user) {
+        if (user) {
+          // Used to debug dash exhibition of user account
+            // console.log("AUTH USER OBJECT:", JSON.stringify(user, null, 2));
+        }
+    }, [user]);
+
+    useEffect(() => {
+        if (token && user?.id) {
             try {                loadQuery({ 
                     first: 3, 
                     after: cursor,
@@ -109,7 +104,7 @@ const DashboardPage: React.FC<DashboardPageProps> = () => {
         );
     }
     
-    const userAccountId = user.taxId || "";
+    const userAccountId = user.id || "";
     
     return (
         <Container maxWidth="md" sx={{ py: 4 }}>

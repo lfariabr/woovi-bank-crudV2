@@ -44,7 +44,7 @@ export const Transaction = (props: TransactionProps) => {
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography fontWeight={500}>
-          {isIncoming ? 'Received' : 'Sent'} ${(transaction.amount / 100).toFixed(2)}
+          {isIncoming ? 'Received' : 'Sent'} ${(transaction.amount / 1).toFixed(2)}
         </Typography>
         <Chip 
           label={isIncoming ? 'INCOMING' : 'OUTGOING'} 

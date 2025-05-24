@@ -8,6 +8,17 @@ export const ACCOUNT_QUERY = graphql`
     $account_id_receiver: String,
     $amount: Float
   ) {
+    # Direct query for the current user's account
+    myAccount {
+      id
+      first_name
+      last_name
+      email
+      taxId
+      accountId
+      balance
+    }
+    
     ...AccountList_query @arguments(
       first: $first, 
       after: $after
