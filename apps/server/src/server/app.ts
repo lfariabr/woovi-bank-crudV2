@@ -24,7 +24,17 @@ app.use(
 	})
 );
 
-app.use(authenticate);
+// Custom authentication middleware that bypasses auth for GraphiQL
+app.use(async (ctx, next) => {
+	// Skip authentication for GraphiQL requests
+	if (ctx.path === '/graphql' && ctx.method === 'GET') {
+		return next();
+	}
+	
+	// Apply authentication for all other requests
+	await authenticate(ctx, next);
+});
+
 app.use(createWebsocketMiddleware());
 
 const routes = new Router();

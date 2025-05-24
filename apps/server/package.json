@@ -14,6 +14,7 @@
 		"dataloader": "^2.2.2",
 		"dotenv-safe": "^8.2.0",
 		"graphql": "^16.8.1",
+		"graphql-playground-middleware-koa": "^1.6.22",
 		"graphql-redis-subscriptions": "^2.6.0",
 		"graphql-relay": "^0.10.0",
 		"graphql-relay-subscription": "^1.0.0",

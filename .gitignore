@@ -35,3 +35,4 @@ npm-debug.log*
 
 **/__generated__/*.ts
 .windsurfrules
+.cursor

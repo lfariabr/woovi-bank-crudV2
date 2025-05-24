@@ -1,0 +1,306 @@
+{
+  "info": {
+    "name": "Woovi Bank API",
+    "description": "A collection for testing the Woovi Bank GraphQL API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "List Accounts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetAccounts($first: Int, $after: String) {\n  accounts(first: $first, after: $after) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    edges {\n      node {\n        id\n        first_name\n        last_name\n        email\n        taxId\n        accountId\n        balance\n        isActive\n        createdAt\n      }\n    }\n  }\n}",
+                "variables": "{\n  \"first\": 10\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Create Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateAccount($input: AccountAddInput!) {\n  AccountAdd(input: $input) {\n    account {\n      id\n      first_name\n      last_name\n      email\n      taxId\n      accountId\n      balance\n      isActive\n      createdAt\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"taxId\": \"123.456.789-00\",\n    \"accountId\": \"ACC12345\",\n    \"balance\": \"1000.00\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Update Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UpdateAccount($input: AccountUpdateInput!) {\n  AccountUpdate(input: $input) {\n    account {\n      id\n      first_name\n      last_name\n      email\n      taxId\n      accountId\n      balance\n      isActive\n      createdAt\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Smith\",\n    \"email\": \"john.smith@example.com\",\n    \"accountId\": \"ACC12345\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Register Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation Register($input: RegisterInput!) {\n  register(input: $input) {\n    token\n    account {\n      id\n      first_name\n      last_name\n      email\n      taxId\n      accountId\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"email\": \"new.user@example.com\",\n    \"password\": \"securePassword123\",\n    \"first_name\": \"New\",\n    \"last_name\": \"User\",\n    \"taxId\": \"987.654.321-00\",\n    \"accountId\": \"ACC98765\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    token\n    account {\n      id\n      first_name\n      last_name\n      email\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"password123\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Get Account Balance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetMyAccount {\n  myAccount {\n    id\n    first_name\n    last_name\n    email\n    accountId\n    balance\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "List Transactions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetTransactions($first: Int, $after: String) {\n  transactions(first: $first, after: $after) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    edges {\n      node {\n        id\n        account_id_sender\n        account_id_receiver\n        amount\n        createdAt\n      }\n    }\n  }\n}",
+                "variables": "{\n  \"first\": 10\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Filter Transactions by Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetAccountTransactions($first: Int, $account_id: String!) {\n  transactions(first: $first, account_id_sender: $account_id) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    edges {\n      node {\n        id\n        account_id_sender\n        account_id_receiver\n        amount\n        createdAt\n      }\n    }\n  }\n}",
+                "variables": "{\n  \"first\": 10,\n  \"account_id\": \"ACC12345\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Send Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation SendTransaction($input: SendTransactionInput!) {\n  SendTransaction(input: $input) {\n    transaction {\n      id\n      account_id_sender\n      account_id_receiver\n      amount\n      createdAt\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"account_id_sender\": \"ACC12345\",\n    \"account_id_receiver\": \"ACC98765\",\n    \"amount\": 100\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Receive Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation ReceiveTransaction($input: ReceiveTransactionInput!) {\n  ReceiveTransaction(input: $input) {\n    transaction {\n      id\n      account_id_sender\n      account_id_receiver\n      amount\n      createdAt\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"account_id_receiver\": \"ACC98765\",\n    \"account_id_sender\": \"ACC12345\",\n    \"amount\": 100\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+} 
