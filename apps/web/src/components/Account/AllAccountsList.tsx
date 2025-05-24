@@ -1,11 +1,13 @@
 import React from 'react';
 import { graphql, useFragment } from 'react-relay';
-import { Box, Paper, Typography, Button, CircularProgress, Grid } from '@mui/material';
 // Adjust the import path as needed for your generated types
 import { AllAccountsListFragment_query$key } from '../../__generated__/AllAccountsListFragment_query.graphql';
 
 import { usePaginationFragment } from 'react-relay';
 import { ALL_ACCOUNTS_LIST_FRAGMENT } from './AllAccountsListFragment';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Loader2 } from 'lucide-react';
 
 type Props = {
   query: AllAccountsListFragment_query$key;
@@ -29,7 +31,7 @@ type Props = {
     );
 
     if (!data?.allAccounts?.edges?.length) {
-      return <Typography>No accounts found.</Typography>;
+      return <p className="text-center py-4 text-gray-500">No accounts found.</p>;
     }
 
     const loadMore = () => {
@@ -38,48 +40,57 @@ type Props = {
     };
 
     return (
-    <Box>
-      <Grid container spacing={2}>
+    <div className="container mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {data.allAccounts.edges.map((edge) =>
           edge?.node ? (
-            <Grid item xs={12} sm={6} key={edge.node.id}>
-              <Paper sx={{ p: 2, height: '100%' }}>
-                <Typography variant="body1" gutterBottom>
-                  Account name: {edge.node.first_name} {edge.node.last_name}
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                  Account ID: {edge.node.accountId}
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                  Balance: ${Number(edge.node.balance) / 100}
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                  Tax ID: {edge.node.taxId}
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                  Created: {edge.node.createdAt}
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                  Status: {edge.node.isActive ? 'Active' : 'Inactive'}
-                </Typography>
-              </Paper>
-            </Grid>
+            <div key={edge.node.id} className="w-full">
+              <Card className="h-full">
+                <CardContent className="p-4 space-y-2">
+                  <p className="font-medium">
+                    Account name: {edge.node.first_name} {edge.node.last_name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Account ID: {edge.node.accountId}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Balance: ${Number(edge.node.balance) / 100}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Tax ID: {edge.node.taxId}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Created: {edge.node.createdAt}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Status: {edge.node.isActive ? 'Active' : 'Inactive'}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           ) : null
         )}
-      </Grid>
+      </div>
       
       {hasNext && (
-        <Box sx={{ textAlign: 'center', mt: 2 }}>
+        <div className="text-center mt-6">
           <Button
-            variant="outlined"
+            variant="outline"
             onClick={loadMore}
             disabled={isLoadingNext}
-            startIcon={isLoadingNext ? <CircularProgress size={20} /> : null}
+            className="min-w-[120px]"
           >
-            {isLoadingNext ? 'Loading...' : 'Load More'}
+            {isLoadingNext ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              'Load More'
+            )}
           </Button>
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

@@ -1,23 +1,23 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  Button,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  CircularProgress,
-  Alert,
-  Grid,
-} from '@mui/material';
+import { Loader2 } from 'lucide-react';
 import { createEnvironment } from '../../relay/environment';
 import { sendTransaction } from '../../app/transactions/SendTransactionMutation';
 import { useRouter } from 'next/navigation';
+
+// Import Shadcn UI components
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Card, CardContent } from '../ui/card';
+import { Alert, AlertDescription } from '../ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 
 type Account = {
   id: string;
@@ -101,7 +101,6 @@ export function SendTransactionForm({
         receiverAccountId,
         Number(amount),
         (response) => {
-          console.log('Transaction completed successfully:', response);
           setLoading(false);
           setSuccess(true);
           // Reset form
@@ -138,80 +137,85 @@ export function SendTransactionForm({
   )?.node;
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+    <form onSubmit={handleSubmit} className="mt-4">
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
       
       {success && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          Transaction successful!
+        <Alert variant="success" className="mb-4">
+          <AlertDescription>Transaction successful!</AlertDescription>
         </Alert>
       )}
       
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Typography variant="h6">Your Account</Typography>
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-medium">Your Account</h3>
           {userAccount ? (
-            <Paper sx={{ p: 2, mt: 1 }}>
-              <Typography variant="body1">
-                <strong>Name:</strong> {`${userAccount.first_name || ''} ${userAccount.last_name || ''}`}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Balance:</strong> ${userAccount.balance?.toString ? parseFloat(userAccount.balance.toString()).toFixed(2) : '0.00'}
-              </Typography>
-            </Paper>
+            <Card className="mt-2">
+              <CardContent className="pt-4">
+                <p className="mb-1">
+                  <strong>Name:</strong> {`${userAccount.first_name || ''} ${userAccount.last_name || ''}`}
+                </p>
+                <p>
+                  <strong>Balance:</strong> ${userAccount.balance?.toString ? parseFloat(userAccount.balance.toString()).toFixed(2) : '0.00'}
+                </p>
+              </CardContent>
+            </Card>
           ) : (
-            <Typography color="text.secondary">Loading your account...</Typography>
+            <p className="text-muted-foreground">Loading your account...</p>
           )}
-        </Grid>
+        </div>
         
-        <Grid item xs={12}>
-          <FormControl fullWidth required>
-            <InputLabel id="receiver-account-label">Receiver Account</InputLabel>
-            <Select
-              labelId="receiver-account-label"
-              value={receiverAccountId}
-              onChange={(e) => setReceiverAccountId(e.target.value)}
-              label="Receiver Account"
-              disabled={loading || success}
-            >
+        <div className="space-y-2">
+          <label htmlFor="receiver-account" className="text-sm font-medium">Receiver Account</label>
+          <Select
+            value={receiverAccountId}
+            onValueChange={setReceiverAccountId}
+            disabled={loading || success}
+          >
+            <SelectTrigger id="receiver-account" className="w-full">
+              <SelectValue placeholder="Select a receiver account" />
+            </SelectTrigger>
+            <SelectContent>
               {otherAccounts.length > 0 ? (
                 otherAccounts.map(account => 
                   account?.node ? (
-                    <MenuItem key={account.node.id} value={account.node.id}>
+                    <SelectItem key={account.node.id} value={account.node.id}>
                       {`${account.node.first_name || ''} ${account.node.last_name || ''}`} - ${account.node.balance?.toString ? parseFloat(account.node.balance.toString()).toFixed(2) : '0.00'}
-                    </MenuItem>
+                    </SelectItem>
                   ) : null
                 )
               ) : (
-                <MenuItem disabled value="">No other accounts available</MenuItem>
+                <SelectItem disabled value="">No other accounts available</SelectItem>
               )}
-            </Select>
-          </FormControl>
-        </Grid>
+            </SelectContent>
+          </Select>
+        </div>
         
-        <Grid item xs={12}>
-          <TextField
-            label="Amount"
+        <div className="space-y-2">
+          <label htmlFor="amount" className="text-sm font-medium">Amount</label>
+          <Input
+            id="amount"
             type="number"
-            fullWidth
-            required
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            inputProps={{ min: "0.01", step: "0.01" }}
+            min="0.01"
+            step="0.01"
             disabled={loading || success}
-            helperText="Enter amount in dollars"
+            required
+            className="w-full"
           />
-        </Grid>
-      </Grid>
+          <p className="text-xs text-muted-foreground">Enter amount in dollars</p>
+        </div>
+      </div>
       
-      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+      <div className="flex justify-between mt-8">
         <Button
           type="button"
-          variant="outlined"
+          variant="outline"
           onClick={() => {
             setAmount('');
             setReceiverAccountId('');
@@ -224,14 +228,13 @@ export function SendTransactionForm({
         </Button>
         <Button
           type="submit"
-          variant="contained"
-          color="primary"
           disabled={loading || success || !senderAccountId}
-          startIcon={loading ? <CircularProgress size={20} /> : null}
+          className="flex items-center"
         >
+          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {loading ? 'Processing...' : 'Send Money'}
         </Button>
-      </Box>
-    </Box>
+      </div>
+    </form>
   );
 }

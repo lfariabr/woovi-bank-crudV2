@@ -1,7 +1,8 @@
-import { Send } from '@mui/icons-material';
-import { Box, IconButton, TextField } from '@mui/material';
+import { Box, Send } from 'lucide-react';
 import { useMutation } from 'react-relay';
 import { useState } from 'react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 import { MessageAdd } from './MessageAddMutation';
 import { MessageAddMutation } from '../../__generated__/MessageAddMutation.graphql';
@@ -29,39 +30,26 @@ export const MessageList = ({ children }: MessageListProps) => {
 	};
 
 	return (
-		<Box
-			sx={{
-				height: '100%',
-				display: 'flex',
-				flexDirection: 'column',
-				gap: 2,
-				justifyContent: 'flex-end',
-			}}
-		>
+		<div className="h-full flex flex-col gap-4 justify-end">
 			{children}
-			<form onSubmit={handleSubmit}>
-				<Box sx={{ display: 'flex', gap: 1 }}>
-					<TextField
-						label="Message"
-						variant="outlined"
-						size="small"
-						sx={{ width: '100%' }}
+			<form onSubmit={handleSubmit} className="w-full">
+				<div className="flex gap-2">
+					<Input
+						placeholder="Type your message..."
+						className="w-full"
 						value={content}
 						onChange={(e) => setContent(e.target.value)}
 					/>
-					<IconButton
+					<Button
 						type="submit"
 						disabled={isPending}
-						sx={{
-							color: '#FFFFFF',
-							backgroundColor: '#03d69d',
-							borderRadius: 0.5,
-						}}
+						className="bg-[#03d69d] hover:bg-[#02b987] text-white"
+						size="icon"
 					>
-						<Send />
-					</IconButton>
-				</Box>
+						<Send className="h-4 w-4" />
+					</Button>
+				</div>
 			</form>
-		</Box>
+		</div>
 	);
 };

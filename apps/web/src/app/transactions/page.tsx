@@ -65,7 +65,6 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({
   const loadTransactionData = () => {
     if (token && user?.id) {
       try {
-        console.log("Loading transactions for user:", user.id);
         loadTransactionsQuery({ 
           first: 3, 
           after: cursor,
@@ -83,7 +82,6 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({
   const loadAccountsData = () => {
     if (token) {
       try {
-        console.log("Loading accounts data");
         loadAccountsQuery({ 
           first: 10, 
           after: null
@@ -95,7 +93,6 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({
           const senderIdParam = params.get('senderId');
           
           if (senderIdParam) {
-            console.log("Pre-selected sender account:", senderIdParam);
             // We'll pass this to the SendTransactionContent component
           }
         }

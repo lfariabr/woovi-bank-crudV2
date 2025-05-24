@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { authStore } from '../../lib/auth-store';
-import styles from './Navbar.module.css';
 
 const Navbar: React.FC = () => {
     const pathname = usePathname();
@@ -32,26 +31,35 @@ const Navbar: React.FC = () => {
     // }
 
     return (
-        <nav className={styles.navbar}>
-            <div className={styles.logo}>
-                <Link href="/">
+        <nav style={{ width: '100%', borderBottom: '1px solid #e5e7eb', background: 'white', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
                     <Image
                         src="/logo.png"
                         alt="Woovi Logo"
-                        width={80}
-                        height={80}
+                        width={45}
+                        height={45}
+                        style={{ marginRight: '10px' }}
                         priority
                     />
+                    <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#03d69d' }}>Woovi</span>
                 </Link>
             </div>
             
-            <ul className={styles.navLinks}>
+            <ul style={{ display: 'flex', alignItems: 'center', listStyle: 'none', gap: '20px', margin: 0, padding: 0 }}>
                 {isClient && token ? (
                     // if user is logged in
                     <>
                         <li>
                             <Link 
-                                className={pathname === '/admin' ? styles.active : ''}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '4px',
+                                    textDecoration: 'none',
+                                    color: pathname === '/admin' ? 'white' : '#4b5563',
+                                    backgroundColor: pathname === '/admin' ? '#03d69d' : 'transparent',
+                                    fontWeight: 500
+                                }}
                                 href="/admin"
                             >
                                 Admin
@@ -60,7 +68,14 @@ const Navbar: React.FC = () => {
                         <li>
                             <Link 
                                 href="/dashboard" 
-                                className={pathname === '/dashboard' ? styles.active : ''}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '4px',
+                                    textDecoration: 'none',
+                                    color: pathname === '/dashboard' ? 'white' : '#4b5563',
+                                    backgroundColor: pathname === '/dashboard' ? '#03d69d' : 'transparent',
+                                    fontWeight: 500
+                                }}
                             >
                                 Dashboard
                             </Link>
@@ -68,22 +83,39 @@ const Navbar: React.FC = () => {
                         <li>
                             <Link 
                                 href="/transactions" 
-                                className={pathname === '/transactions' ? styles.active : ''}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '4px',
+                                    textDecoration: 'none',
+                                    color: pathname === '/transactions' ? 'white' : '#4b5563',
+                                    backgroundColor: pathname === '/transactions' ? '#03d69d' : 'transparent',
+                                    fontWeight: 500
+                                }}
                             >
                                 Transactions
                             </Link>
                         </li>
 
                         {user?.email && (
-                            <li className={styles.userEmail}>
-                                Welcome, {user.email}
-                                <br />
-                                <button 
-                                    onClick={handleLogout}
-                                    className={styles.logoutButton}
-                                >
-                                    Logout
-                                </button>
+                            <li style={{ marginLeft: '20px', paddingLeft: '20px', borderLeft: '1px solid #e5e7eb' }}>
+                                <div>
+                                    <span style={{ fontSize: '0.875rem', color: '#4b5563' }}>Welcome, {user.email}</span>
+                                    <br />
+                                    <button 
+                                        onClick={handleLogout}
+                                        style={{ 
+                                            fontSize: '0.875rem', 
+                                            color: '#ef4444', 
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            padding: '0',
+                                            marginTop: '4px'
+                                        }}
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
                             </li>
                         )}
                     </>
@@ -92,7 +124,14 @@ const Navbar: React.FC = () => {
                     <li>
                         <Link 
                             href="/login" 
-                            className={pathname === '/login' ? styles.active : ''}
+                            style={{
+                                padding: '8px 16px',
+                                borderRadius: '4px',
+                                backgroundColor: '#03d69d',
+                                color: 'white',
+                                textDecoration: 'none',
+                                fontWeight: 500
+                            }}
                         >
                             Login
                         </Link>

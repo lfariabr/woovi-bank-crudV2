@@ -1,4 +1,3 @@
-import { Container } from '@mui/material';
 import Navbar from './Navbar/Navbar';
 import Footer from './Footer/Footer';
 
@@ -8,20 +7,11 @@ type LayoutProps = {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+		<div className="flex flex-col min-h-screen">
 			<Navbar />
-			<Container 
-				maxWidth="xl"
-				sx={{
-					flex: 1,
-					py: 4,
-					px: { xs: 2, sm: 3, md: 4 },
-					width: '100%',
-					maxWidth: '100%',
-				}}
-			>
+			<main className="flex-1 py-8 px-4 sm:px-6 md:px-8 w-full max-w-screen-2xl mx-auto">
 				{children}
-			</Container>
+			</main>
 			<Footer />
 		</div>
 	);

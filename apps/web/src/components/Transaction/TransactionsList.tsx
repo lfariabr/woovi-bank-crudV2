@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import { usePaginationFragment } from 'react-relay';
 import { graphql } from 'react-relay';
+import { Button } from '../ui/button';
+import { Loader2 } from 'lucide-react';
 
 import { Transaction } from './Transaction';
 import { TransactionsList_query$key } from '../../__generated__/TransactionsList_query.graphql';
@@ -64,26 +65,26 @@ export const TransactionsList = ({
   
   if (!data?.transactions?.edges) {
     return (
-      <Box sx={{ py: 4, textAlign: 'center' }}>
-        <Typography variant="body1" color="text.secondary">
+      <div className="py-8 text-center">
+        <p className="text-gray-500">
           No transaction data available.
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   if (data.transactions.edges.length === 0) {
     return (
-      <Box sx={{ py: 4, textAlign: 'center' }}>
-        <Typography variant="body1" color="text.secondary">
+      <div className="py-8 text-center">
+        <p className="text-gray-500">
           No transactions found.
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <div className="flex flex-col space-y-4">
       {data.transactions.edges.map((edge) =>
         edge && edge.node ? (
           <Transaction
@@ -92,20 +93,27 @@ export const TransactionsList = ({
             currentUserAccountId={currentUserAccountId}
           />
         ) : null
-)}
+      )}
       
       {hasNext && (
-        <Box sx={{ textAlign: 'center', mt: 2 }}>
+        <div className="text-center mt-4">
           <Button 
-            variant="outlined" 
+            variant="outline" 
             onClick={loadMore} 
             disabled={isLoadingNext}
-            startIcon={isLoadingNext ? <CircularProgress size={20} /> : null}
+            className="min-w-[120px]"
           >
-            {isLoadingNext ? 'Loading...' : 'Load More'}
+            {isLoadingNext ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              'Load More'
+            )}
           </Button>
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button } from '../ui/button';
 import { useMutation } from 'react-relay';
 import { TRANSACTION_SEND_MUTATION } from '../../app/transactions/transactionSend';
 import { authStore } from '../../lib/auth-store';
@@ -28,8 +28,7 @@ export const SendTransaction = (props: SendTransactionProps) => {
 
     return (
         <Button
-            variant="contained"
-            color="primary"
+            variant="default"
             onClick={handleSendTransaction}
         >
             Send

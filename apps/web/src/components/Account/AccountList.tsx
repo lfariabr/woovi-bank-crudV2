@@ -1,7 +1,11 @@
 import React from 'react';
-import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import { usePaginationFragment } from 'react-relay';
 import { graphql } from 'react-relay';
+import { Loader2 } from 'lucide-react';
+
+// Import Shadcn UI components
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
 
 import { Account } from './Account';
 import { AccountList_query$key } from '../../__generated__/AccountList_query.graphql';
@@ -63,28 +67,28 @@ export const AccountList = ({
 
   if (!data?.accounts?.edges) {
     return (
-      <Box sx={{ py: 4, textAlign: 'center' }}>
-        <Typography variant="body1" color="text.secondary">
+      <div className="py-8 text-center">
+        <p className="text-muted-foreground">
           No account data available.
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   if (data.accounts.edges.length === 0) {
     return (
-      <Box sx={{ py: 4, textAlign: 'center' }}>
-        <Typography variant="body1" color="text.secondary">
+      <div className="py-8 text-center">
+        <p className="text-muted-foreground">
           No accounts found.
-        </Typography>
-      </Box>
+        </p>
+      </div>
     );
   }
 
   if (showOnlyUserAccount) {
     
     // Get the current user's information from localStorage
-    let userData = null;
+    let userData: { accountId?: string } | null = null;
     try {
       if (typeof window !== 'undefined') {
         const userStr = localStorage.getItem('user');
@@ -93,20 +97,17 @@ export const AccountList = ({
         }
       }
     } catch (e) {
+      // Error handling silently
     }
     
-    
     // Find the account that matches the logged-in user's accountId
-    let accountEdge = null;
+    let accountEdge: any = null;
     
     if (userData && userData.accountId) {
       // Try to find an account with matching accountId
       accountEdge = data.accounts.edges.find(edge => 
-        edge?.node?.accountId === userData.accountId
+        edge?.node?.accountId === userData?.accountId
       );
-      
-      if (accountEdge) {
-      }
     }
     
     // If no match found, use the first account as fallback
@@ -117,35 +118,35 @@ export const AccountList = ({
     // If there's no account, show an error
     if (!accountEdge || !accountEdge.node) {
       return (
-        <Box sx={{ py: 4, textAlign: 'center' }}>
-          <Typography variant="body1" color="text.secondary">
+        <div className="py-8 text-center">
+          <p className="text-muted-foreground">
             No account available.
-          </Typography>
-        </Box>
+          </p>
+        </div>
       );
     }
     
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle1" color="primary">
+      <div className="flex flex-col gap-4">
+        <div className="mb-4">
+          <h3 className="text-lg font-medium text-primary">
             Your Account (ID: {currentUserAccountId})
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+          </h3>
+          <p className="text-sm text-muted-foreground mt-1">
             Account details for {accountEdge.node.first_name} {accountEdge.node.last_name}
-          </Typography>
-        </Box>
+          </p>
+        </div>
         <Account
           key={accountEdge.node.id}
           account={accountEdge.node}
           currentUserAccountId={currentUserAccountId}
         />
-      </Box>
+      </div>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <div className="flex flex-col gap-4">
       {data.accounts.edges.map((edge) =>
         edge && edge.node ? (
           <Account
@@ -157,17 +158,18 @@ export const AccountList = ({
       )}
       
       {hasNext && !showOnlyUserAccount && (
-        <Box sx={{ textAlign: 'center', mt: 2 }}>
+        <div className="text-center mt-4">
           <Button 
-            variant="outlined" 
+            variant="outline" 
             onClick={loadMore} 
             disabled={isLoadingNext}
-            startIcon={isLoadingNext ? <CircularProgress size={20} /> : null}
+            className="flex items-center gap-2"
           >
+            {isLoadingNext && <Loader2 className="h-4 w-4 animate-spin" />}
             {isLoadingNext ? 'Loading...' : 'Load More'}
           </Button>
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
