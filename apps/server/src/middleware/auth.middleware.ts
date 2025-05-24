@@ -9,7 +9,7 @@ export const authenticate = async (ctx: Context, next: () => Promise<any>) => {
     return next();
   }
   const token = authHeader.split(' ')[1];
-  console.log('Token received:', token);
+  // console.log('Token received:', token);
 
   const isBlacklisted = await authService.isTokenBlacklisted(token);
   if (isBlacklisted) {
@@ -19,7 +19,7 @@ export const authenticate = async (ctx: Context, next: () => Promise<any>) => {
   
   try {
     const { accountId } = authService.verifyToken(token);
-    console.log('Token verified successfully for accountId:', accountId);
+    // console.log('Token verified successfully for accountId:', accountId);
     ctx.state.accountId = accountId;
   } catch (err) {
     console.error('Token verification failed:', err);

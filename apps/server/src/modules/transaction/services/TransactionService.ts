@@ -4,34 +4,46 @@ import mongoose from "mongoose";
 const MAX_RETRIES = 3;
 
 export async function sendTransaction(senderId: string, receiverId: string, amount: number) {
+  console.log(`Starting transaction: from ${senderId} to ${receiverId} amount ${amount}`);
+  
   if (senderId === receiverId) throw new Error('Sender and receiver cannot be the same');
   if (amount <= 0) throw new Error('Amount must be greater than 0');
 
   let attempts = 0;
   while (attempts < MAX_RETRIES) {
+    
+    // I understand that this is secure enough for this use case
+    // #TODO validate better this approach
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
+      // Log the IDs being used for lookup
+      console.log(`Looking up accounts: sender=${senderId}, receiver=${receiverId}`);
+      
       const [sender, receiver] = await Promise.all([
         Account.findById(senderId).session(session),
         Account.findById(receiverId).session(session),
       ])
+      
+      console.log('Accounts found:', { 
+        sender: sender ? { id: sender._id.toString(), balance: sender.balance } : 'not found', 
+        receiver: receiver ? { id: receiver._id.toString(), balance: receiver.balance } : 'not found' 
+      });
 
       if (!sender || !receiver) throw new Error('Sender or receiver account not found');
 
-      // Directly checking balance
       if (Number(sender.balance) < amount) {
         throw new Error('Insufficient balance');
       }
-      // Directly debiting
+      // debit
       const senderUpdate = await Account.updateOne(
         { _id: senderId, __v: sender.__v },
         { $inc: { balance: -amount, __v: 1 } },
         { session }
       );
 
-      // Directly crediting
+      // credit
       const receiverUpdate = await Account.updateOne(
         { _id: receiverId, __v: receiver.__v },
         { $inc: { balance: amount, __v: 1 } },
@@ -40,7 +52,6 @@ export async function sendTransaction(senderId: string, receiverId: string, amou
 
       if (senderUpdate.modifiedCount === 0) throw new Error('Insufficient balance or account not found');
 
-      // Directly Creating transaction record
       const transaction = await createTransaction(senderId, receiverId, amount, session);
 
       // TODO: log to Ledger module here
@@ -50,14 +61,21 @@ export async function sendTransaction(senderId: string, receiverId: string, amou
       return transaction;
 
     } catch (error) {
-      console.error('Transaction error:', error);
+      console.error('Transaction error details:', error);
+      console.error(`Attempted to send ${amount} from ${senderId} to ${receiverId}`);
+      
+      // Log more specific information about the error
+      if (error.name === 'CastError') {
+        console.error(`CastError details: path=${error.path}, kind=${error.kind}, value=${error.value}`);
+      }
+      
       await session.abortTransaction();
       session.endSession();
       attempts++;
-      console.log('Transaction failed. Retrying...');
-      // Don't retry for insufficient balance - it won't change
+      console.log(`Transaction failed. Retry attempt ${attempts}/${MAX_RETRIES}...`);
+
       if (error.message.includes('Insufficient balance')) {
-        throw error; // Throw original error immediately
+        throw error;
       }
 
       if (attempts >= MAX_RETRIES) {
@@ -76,42 +94,3 @@ export async function createTransaction(senderId: string, receiverId: string, am
 	}], { session });
 	return docs[0];
 }
-
-// Deprecated functions:
-
-// export async function validateSufficientBalance(accountId: string, amount: number) {
-//   const account = await Account.findById(accountId);
-//   if (!account) throw new Error('Account not found');
-//   if (Number(account.balance) < amount) throw new Error('Insufficient balance');
-// }
-
-// export async function debitAccount(accountId: string, amount: number) {
-//   const res = await Account.updateOne(
-//     { _id: accountId, balance: { $gte: amount } },
-//     { $inc: { balance: -amount } }
-//   );
-//   if (res.modifiedCount === 0) throw new Error('Insufficient balance or account not found');
-// }
-
-// export async function creditAccount(accountId: string, amount: number) {
-//   await Account.updateOne(
-//     { _id: accountId },
-//     { $inc: { balance: amount } }
-//   );
-// }
-
-// export async function receiveTransaction(receiverId: string, senderId?: string, amount?: number) {
-// 	if (amount && amount <= 0) throw new Error('Amount must be greater than 0');
-	
-// 	const receiverAccount = await Account.findById(receiverId);
-// 	if (!receiverAccount) throw new Error('Receiver account not found');
-	
-// 	if (senderId && receiverId === senderId) throw new Error('Sender and receiver cannot be the same');
-	
-// 	await creditAccount(receiverId, amount || 0);
-
-// 	log to Ledger module here
-	
-// 	// Create transaction record
-// 	return createTransaction(senderId || '', receiverId, amount || 0);
-// }

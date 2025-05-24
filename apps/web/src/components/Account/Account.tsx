@@ -1,4 +1,6 @@
+import React from 'react';
 import { Box, Button, Card, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { graphql, useFragment } from 'react-relay';
 import { Account_account$key } from '../../__generated__/Account_account.graphql';
 
@@ -20,10 +22,17 @@ export const Account = (props: AccountProps) => {
     props.account
   );
 
+  const router = useRouter();
+
+  const handleTransfer = () => {
+    // Navigate to transactions page with send money tab pre-selected
+    router.push(`/transactions?activeTab=1&senderId=${account.id}`);
+  };
+
   if (!account || !account.first_name) {
     return (
       <Card variant="outlined" sx={{ p: 2 }}>
-        <Typography>Account information not available</Typography>
+        <Typography color="text.secondary">Account information not available</Typography>
       </Card>
     );
   }
@@ -49,7 +58,11 @@ export const Account = (props: AccountProps) => {
         <Typography variant="body2">
           Account ID: {account.accountId}
         </Typography>
-        <Button variant="contained" color="primary">
+        <Button 
+          onClick={handleTransfer}
+          variant="contained"
+          color="primary"
+        >
           Transfer
         </Button>
       </Box>
