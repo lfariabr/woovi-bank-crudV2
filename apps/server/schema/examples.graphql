@@ -119,9 +119,9 @@ mutation {
 mutation {
   SendTransaction(
     input: {
-      account_id_sender: "QWNjb3VudDo2ODIyYTgwNjVjN2E3MTM3OGY1OGZmMTA="
-      account_id_receiver: "QWNjb3VudDo2ODIyYTdhNTVjN2E3MTM3OGY1OGZmMDU="
-      amount: 2000
+      account_id_sender: "QWNjb3VudDo2ODJiYmY1MDhmNjcwZmQ5NmU3ZjIwMWI="
+      account_id_receiver: "QWNjb3VudDo2ODJkMTM0YmE0YjJiMWIyMjAzYzNlYjk="
+      amount: 10
     }
   ) {
     transaction {

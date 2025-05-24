@@ -31,21 +31,32 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({
     setIsClient(true);
   }, []);
 
+  // Load transactions directly using the user.id from auth store (MongoDB ObjectId)
   useEffect(() => {
-    if (token) {
+    if (token && user?.id) {
       try {
+        console.log("Using user ID from auth store:", user.id);
         loadQuery({ 
-          first: 10, 
+          first: 3, 
           after: cursor,
-          account_id_sender: user.id,
-          account_id_receiver: account_id_receiver && account_id_receiver.trim() !== '' ? account_id_receiver : undefined, 
-          amount: amount && amount > 0 ? amount : undefined
+          account_id_sender: user.id,  // The ID from auth store is already the MongoDB ObjectId
+          account_id_receiver: user.id, 
+          amount: amount && amount > 0 ? amount : null
         });
       } catch (error) {
         console.error("Error loading transactions query:", error);
       }
+    } else if (token) {
+      // If no user ID available, load without filters
+      loadQuery({ 
+        first: 3, 
+        after: cursor,
+        account_id_sender: null,
+        account_id_receiver: null, 
+        amount: amount && amount > 0 ? amount : null
+      });
     }
-  }, [token, loadQuery, cursor, user, account_id_receiver, amount]);
+  }, [token, loadQuery, cursor, user, amount]);
 
   if (!isClient) {
     return (

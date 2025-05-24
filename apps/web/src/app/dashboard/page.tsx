@@ -8,8 +8,9 @@ import { authStore } from '../../lib/auth-store';
 import { AccountList } from '../../components/Account/AccountList';
 import type { AccountQuery as AccountQueryType } from '../../__generated__/AccountQuery.graphql';
 import { ACCOUNT_QUERY } from './AccountQuery';
+import { TransactionsList } from '../../components/Transaction/TransactionsList';
 
-// Separate component for account content using Suspense
+
 function AccountContent({ 
   queryRef, 
   currentUserAccountId 
@@ -25,6 +26,18 @@ function AccountContent({
       </Typography>
     );
   }
+  let userAccountObjectId = "";
+  if (data && data.accounts && data.accounts.edges) {
+    const userAccount = data.accounts.edges.find(
+      edge => edge?.node?.taxId === currentUserAccountId
+    );
+    if (userAccount && userAccount.node) {
+      userAccountObjectId = userAccount.node.id;
+      console.log("Found user account ObjectId:", userAccountObjectId);
+    }
+  }
+
+  
   
   return (
     <Box>
@@ -33,18 +46,16 @@ function AccountContent({
         currentUserAccountId={currentUserAccountId} 
         showOnlyUserAccount={true}
       />
+      <Divider sx={{ mb: 3 }} />
+      <Typography variant="h6" gutterBottom>
+        Transaction History
+      </Typography>
       
-      {/* <Box sx={{ mt: 4 }}>
-        <Typography variant="h6" gutterBottom>
-          All Accounts
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
-        <AccountList 
-          query={data} 
-          currentUserAccountId={currentUserAccountId}
-          showOnlyUserAccount={false} 
-        />
-      </Box> */}
+      <TransactionsList 
+        query={data} 
+        currentUserAccountId={currentUserAccountId}
+        amount={0}
+      />
     </Box>
   );
 }
@@ -65,11 +76,12 @@ const DashboardPage: React.FC<DashboardPageProps> = () => {
     
     useEffect(() => {
         if (token && user) {
-            try {
-                // Load more accounts to ensure we find the user's account
-                loadQuery({ 
-                    first: 10, 
+            try {                loadQuery({ 
+                    first: 3, 
                     after: cursor,
+                    account_id_sender: user.id,
+                    account_id_receiver: user.id,
+                    amount: null
                 });
             } catch (error) {
                 console.error("Error loading account query:", error);
@@ -97,7 +109,6 @@ const DashboardPage: React.FC<DashboardPageProps> = () => {
         );
     }
     
-    // This ID is the accountId field from the schema, which matches the user's taxId
     const userAccountId = user.taxId || "";
     
     return (

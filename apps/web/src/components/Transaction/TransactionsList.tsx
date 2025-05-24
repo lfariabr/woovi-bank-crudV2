@@ -41,17 +41,17 @@ const TRANSACTIONS_FRAGMENT = graphql`
 type TransactionsListProps = {
   query: TransactionsList_query$key;
   currentUserAccountId: string;
-  account_id_sender: string;
-  account_id_receiver: string;
-  amount: number;
+  account_id_sender?: string;
+  account_id_receiver?: string;
+  amount?: number;
 };
 
 export const TransactionsList = ({ 
   query,
   currentUserAccountId,
-  account_id_sender,
-  account_id_receiver,
-  amount 
+  account_id_sender = "",
+  account_id_receiver = "",
+  amount = 0
 }: TransactionsListProps) => {
   const { data, loadNext, isLoadingNext, hasNext } = usePaginationFragment(
     TRANSACTIONS_FRAGMENT,
@@ -59,9 +59,9 @@ export const TransactionsList = ({
   );
   const loadMore = () => {
     if (isLoadingNext) return;
-    loadNext(10);
+    loadNext(3);
   };
-
+  
   if (!data?.transactions?.edges) {
     return (
       <Box sx={{ py: 4, textAlign: 'center' }}>

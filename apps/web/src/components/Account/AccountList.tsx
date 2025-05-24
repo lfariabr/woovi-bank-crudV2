@@ -52,7 +52,6 @@ export const AccountList = ({
   if (data?.accounts?.edges) {
     data.accounts.edges.forEach((edge, i) => {
       if (edge?.node) {
-        console.log(`Account ${i} ID: ${edge.node.id}`);
       }
     });
   }

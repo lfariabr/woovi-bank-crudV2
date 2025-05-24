@@ -15,7 +15,8 @@ type OrCondition = {
   $or: TransactionFilter[];
 };
 
-type FilterCondition = TransactionFilter | OrCondition;
+// type FilterCondition = TransactionFilter | OrCondition;
+type FilterCondition = TransactionFilter | OrCondition | { $and: FilterCondition[] };
 
 export const transactionField = (key: string) => ({
 	[key]: {
@@ -36,14 +37,13 @@ export const transactionConnectionField = (key: string) => ({
 		},
 		resolve: async (_, args, context) => {
 			const { account_id_sender, account_id_receiver, amount, ...paginationArgs } = args;
+			const currentUserAccountId = context.currentUserAccountId;
 			
+			// Convert the MongoDB ObjectId to a string for comparison and to display in the UI
 			let filters: FilterCondition = {};
 			
-			// Build filters based on provided parameters
 			const filterConditions: FilterCondition[] = [];
 				
-				// Handle user ID conditions (show transactions where user is either sender OR receiver)
-				// If both are provided, check if they're the same (user wants their own transactions)
 				if (account_id_sender && account_id_receiver) {
 				if (account_id_sender === account_id_receiver) {
 					filterConditions.push({
@@ -53,12 +53,10 @@ export const transactionConnectionField = (key: string) => ({
 						]
 					});
 				} else {
-					// Different IDs - look for specific sender->receiver transactions
 					filterConditions.push({ account_id_sender: new Types.ObjectId(account_id_sender) });
 					filterConditions.push({ account_id_receiver: new Types.ObjectId(account_id_receiver) });
 				}
 			} else if (account_id_sender && account_id_sender.trim() !== '') {
-				// Just sender provided
 				filterConditions.push({
 					$or: [
 						{ account_id_sender: new Types.ObjectId(account_id_sender) },
@@ -66,7 +64,6 @@ export const transactionConnectionField = (key: string) => ({
 					]
 				});
 			} else if (account_id_receiver && account_id_receiver.trim() !== '') {
-				// Just receiver provided
 				filterConditions.push({
 					$or: [
 						{ account_id_sender: new Types.ObjectId(account_id_receiver) },
@@ -75,18 +72,15 @@ export const transactionConnectionField = (key: string) => ({
 				});
 			}
 			
-			// Handle amount filter only if it's a meaningful value (greater than 0)
 			if (amount && amount > 0) {
 				filterConditions.push({ amount: { $eq: amount } });
 			}
 			
-			// Apply filters if any conditions exist
 			if (filterConditions.length === 1) {
 				filters = filterConditions[0];
 			} else if (filterConditions.length > 1) {
 				filters = { $and: filterConditions };
 			}
-			
 			return await TransactionLoader.loadAll(context, { ...paginationArgs, filters });
 		},
 	},
