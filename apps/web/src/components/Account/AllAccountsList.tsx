@@ -1,52 +1,43 @@
 import React from 'react';
 import { graphql, useFragment } from 'react-relay';
-import { Box, Paper, Typography, Divider } from '@mui/material';
+import { Box, Paper, Typography, Button, CircularProgress } from '@mui/material';
 // Adjust the import path as needed for your generated types
-import { AllAccountsList_query$key } from '../../__generated__/AllAccountsList_query.graphql';
+import { AllAccountsListFragment_query$key } from '../../__generated__/AllAccountsListFragment_query.graphql';
+
+import { usePaginationFragment } from 'react-relay';
+import { ALL_ACCOUNTS_LIST_FRAGMENT } from './AllAccountsListFragment';
 
 type Props = {
-  query: AllAccountsList_query$key;
+  query: AllAccountsListFragment_query$key;
   currentUserAccountId: string;
   showOnlyUserAccount?: boolean;
 };
 
-export const AllAccountsList: React.FC<Props> = ({ query, currentUserAccountId, showOnlyUserAccount }) => {
-  const data = useFragment(
-    graphql`
-      fragment AllAccountsList_query on Query
-      @argumentDefinitions(
-        first: { type: "Int", defaultValue: 100 }
-        after: { type: "String" }
-      ) {
-        allAccounts(first: $first, after: $after) {
-          edges {
-            node {
-              id
-              accountId
-              first_name
-              last_name
-              balance
-              taxId
-              createdAt
-              isActive
-            }
-            cursor
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-      }
-    `,
-    query
-  );
+  export const AllAccountsList: React.FC<Props> =({
+    query,
+    currentUserAccountId,
+    showOnlyUserAccount
+  }) => {
+    const {
+      data,
+      loadNext,
+      isLoadingNext,
+      hasNext,
+    } = usePaginationFragment(
+      ALL_ACCOUNTS_LIST_FRAGMENT,
+      query
+    );
 
-  if (!data?.allAccounts?.edges?.length) {
-    return <Typography>No accounts found.</Typography>;
-  }
+    if (!data?.allAccounts?.edges?.length) {
+      return <Typography>No accounts found.</Typography>;
+    }
 
-  return (
+    const loadMore = () => {
+      if (isLoadingNext) return;
+      loadNext(2);
+    };
+
+    return (
     <Box>
       {data.allAccounts.edges.map((edge) =>
         edge?.node ? (
@@ -71,6 +62,19 @@ export const AllAccountsList: React.FC<Props> = ({ query, currentUserAccountId, 
             </Typography>
           </Paper>
         ) : null
+      )}
+      
+      {hasNext && (
+        <Box sx={{ textAlign: 'center', mt: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={loadMore}
+            disabled={isLoadingNext}
+            startIcon={isLoadingNext ? <CircularProgress size={20} /> : null}
+          >
+            {isLoadingNext ? 'Loading...' : 'Load More'}
+          </Button>
+        </Box>
       )}
     </Box>
   );

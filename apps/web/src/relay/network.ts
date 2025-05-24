@@ -54,7 +54,17 @@ async function networkFetch(
 	variables: Variables,
 	headers?: HeadersInit
 ) {
-	const token = localStorage.getItem('token');
+	let token: string | null = null;
+
+	if (typeof window !== 'undefined') {
+		token = localStorage.getItem('token');
+	} else if (headers && 'cookie' in headers) {
+		const cookie = headers.cookie;
+		const tokenMatch = cookie.match(/token=([^;]+)/);
+		if (tokenMatch) {
+			token = tokenMatch[1];
+		}
+	}
 	// Fetch data from GraphQL API:
 	const response = await fetch(GRAPHQL_ENDPOINT, {
 		method: 'POST',

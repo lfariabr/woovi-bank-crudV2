@@ -8,6 +8,7 @@ import { authStore } from '../../lib/auth-store';
 import { AllAccountsList } from '../../components/Account/AllAccountsList';
 import type { AccountQuery as AccountQueryType } from '../../__generated__/AccountQuery.graphql';
 import { AllAccountsQuery as AllAccountsQueryType } from './AllAccountsQuery';
+import type { AllAccountsQuery as AllAccountsQueryRefType } from '../../__generated__/AllAccountsQuery.graphql';
 
 // Separate component for account content using Suspense
 function AccountContent({ 
@@ -17,7 +18,7 @@ function AccountContent({
   queryRef: any; 
   currentUserAccountId: string;
 }) {
-  const data = usePreloadedQuery(AllAccountsQueryType, queryRef);
+  const data = usePreloadedQuery<AllAccountsQueryRefType>(AllAccountsQueryType, queryRef);
   if (!data) {
     return (
       <Typography variant="body1" align="center">
@@ -49,7 +50,6 @@ type AdminPageProps = {
 const AdminPage: React.FC<AdminPageProps> = () => {
     const { user, token } = authStore.getState();
     const [queryRef, loadQuery] = useQueryLoader<AccountQueryType>(AllAccountsQueryType);
-    const [cursor, setCursor] = useState<string | null>(null);
     const [isClient, setIsClient] = useState(false);
     
     useEffect(() => {
@@ -59,16 +59,15 @@ const AdminPage: React.FC<AdminPageProps> = () => {
     useEffect(() => {
         if (token && user) {
             try {
-                // Load more accounts to ensure we find the user's account
                 loadQuery({ 
-                    first: 100, 
-                    after: cursor,
+                    first: 2, 
+                    after: null,
                 });
             } catch (error) {
                 console.error("Error loading account query:", error);
             }
         }
-    }, [token, loadQuery, cursor, user]);
+    }, [token, loadQuery, user]);
     
     if (!isClient) {
         return (
@@ -90,7 +89,6 @@ const AdminPage: React.FC<AdminPageProps> = () => {
         );
     }
     
-    // This ID is the accountId field from the schema, which matches the user's taxId
     const userAccountId = user.taxId || "";
     
     return (

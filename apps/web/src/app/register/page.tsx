@@ -35,24 +35,18 @@ const Register: React.FC = () => {
 
   const getFriendlyErrorMessage = (error: any): string => {
     const errorMessage = error?.message || '';
-    
     if (errorMessage.includes('taxId: Please enter a valid CPF')) {
       return '⚠️ Please enter a valid CPF (Brazilian tax ID)';
     }
-    
     if (errorMessage.includes('email_1 dup key') || errorMessage.includes('Email already in use')) {
       return '⚠️ This email is already registered. Please use a different email or log in.';
     }
-    
     if (errorMessage.includes('taxId_1 dup key') || errorMessage.includes('CPF already in use')) {
       return '⚠️ This CPF is already registered. Please check your details or contact support.';
     }
-    
     if (errorMessage.includes('accountId_1 dup key') || errorMessage.includes('Account ID already in use')) {
       return '⚠️ This account ID is already in use. Please try a different one.';
     }
-    
-    // Default error message
     return '⚠️ An error occurred during registration. Please check your details and try again.';
   };
 
